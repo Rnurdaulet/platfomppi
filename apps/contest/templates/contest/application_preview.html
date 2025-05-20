@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Предпросмотр заявки" %}{% endblock %}
+
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}
+    <div class="max-w-4xl mx-auto py-6">
+        <h1 class="text-2xl font-bold mb-6">{% trans "Проверка заявки перед подачей" %}</h1>
+
+        <dl class="grid grid-cols-1 gap-4 text-sm">
+            <dt class="font-semibold">{% trans "Ф.И.О. участника" %}</dt>
+            <dd>{{ application.full_name }}</dd>
+
+            <dt class="font-semibold">{% trans "Филиал" %}</dt>
+            <dd>{{ application.branch.name }}</dd>
+
+            <dt class="font-semibold">{% trans "Направление конкурса" %}</dt>
+            <dd>{{ application.direction.name }}</dd>
+
+            <dt class="font-semibold">{% trans "Квалификационная категория" %}</dt>
+            <dd>{{ application.qualification.name }}</dd>
+
+            <dt class="font-semibold">{% trans "Должность" %}</dt>
+            <dd>{{ application.position }}</dd>
+
+            <dt class="font-semibold">{% trans "Организация" %}</dt>
+            <dd>{{ application.organization_name }}</dd>
+
+            <dt class="font-semibold">{% trans "Адрес организации" %}</dt>
+            <dd>{{ application.organization_address }}</dd>
+
+            <dt class="font-semibold">{% trans "Электронная почта" %}</dt>
+            <dd>{{ application.email }}</dd>
+
+            <dt class="font-semibold">{% trans "Телефон" %}</dt>
+            <dd>{{ application.phone }}</dd>
+
+            <dt class="font-semibold">{% trans "Название конкурсного материала" %}</dt>
+            <dd>{{ application.title }}</dd>
+
+            <dt class="font-semibold">{% trans "Файл" %}</dt>
+            <dd><a class="text-blue-600 hover:underline" href="{{ application.file.url }}"
+                   target="_blank">{% trans "Скачать файл" %}</a></dd>
+        </dl>
+
+        <div class="mt-8 flex gap-4">
+            {% if not application.is_locked %}
+                <a href="{% url 'contest:application_edit' %}" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
+                    {% trans "Изменить" %}
+                </a>
+
+                <button id="signButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    {% trans "Подписать и отправить" %}
+                </button>
+            {% else %}
+                <span class="text-green-700 font-semibold">{% trans "Заявка уже подписана и отправлена." %}</span>
+            {% endif %}
+        </div>
+
+        <div id="status" class="mt-4 text-sm text-gray-500"></div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% if not application.is_locked %}
+
+        давай
+        <script id="sign-config" type="application/json">
+            {
+                "endpoint": "{% url 'contest:application_sign' %}",
+                "csrf": "{{ csrf_token }}",
+                "uid": "{{ application.uid }}"
+              }
+        </script>
+        <script src="{% static 'js/ncalayer-client.js' %}"></script>
+        <script src="{% static 'js/sign_application.js' %}"></script>
+    {% endif %}
+{% endblock %}

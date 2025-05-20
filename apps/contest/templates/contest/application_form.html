@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Подача заявки" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+  <h1 class="text-2xl font-bold mb-6">{% trans "Форма заявки на конкурс" %}</h1>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="grid grid-cols-1 gap-6">
+      {% for field in form.visible_fields %}
+        <div>
+          <label class="block text-sm font-medium text-gray-700" for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} *{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+            <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+          {% endif %}
+          {% for error in field.errors %}
+            <p class="text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-6 flex justify-between">
+      {% if form.instance and form.instance.can_edit %}
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+          {% trans "Сохранить и продолжить" %}
+        </button>
+      {% else %}
+        <a href="{% url 'contest:application_preview' %}" class="text-blue-600 hover:underline">
+          {% trans "Назад к заявке" %}
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
