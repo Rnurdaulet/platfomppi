@@ -1,0 +1,60 @@
+{% load static i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>{% block title %}{% trans "Панорама педагогических идей" %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+
+<header class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex gap-4 text-sm items-center">
+            {% if user.is_authenticated %}
+                <span>{% trans "Здравствуйте" %}, {{ user.get_full_name|default:user.username }}</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:underline">
+                        {% trans "Выход" %}
+                    </button>
+                </form>
+
+            {% endif %}
+            <form action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                <select name="language" onchange="this.form.submit()" class="border rounded text-sm">
+                    <option value="ru" {% if LANGUAGE_CODE == 'ru' %}selected{% endif %}>Рус</option>
+                    <option value="kk" {% if LANGUAGE_CODE == 'kk' %}selected{% endif %}>Қаз</option>
+                </select>
+            </form>
+        </div>
+    </div>
+</header>
+
+{% if messages %}
+    <div class="max-w-4xl mx-auto px-4 mt-4">
+        {% for message in messages %}
+            <div class="p-3 mb-2 rounded border {% if message.tags == 'error' %}border-red-500 bg-red-100 text-red-800{% elif message.tags == 'success' %}border-green-500 bg-green-100 text-green-800{% else %}border-gray-300 bg-white{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="max-w-4xl mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="text-center text-sm text-gray-500 py-4 border-t">
+    &copy; {{ now.year }} {% trans "АО 'Орлеу'" %}
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

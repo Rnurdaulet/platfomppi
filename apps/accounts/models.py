@@ -1,3 +1,5 @@
+import secrets
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -25,6 +27,11 @@ class User(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
         ordering = ["-date_joined"]
+
+    @staticmethod
+    def generate_nonce(length=16):
+        """Генерация безопасного nonce"""
+        return secrets.token_urlsafe(length)
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

@@ -23,7 +23,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'apps.accounts'
+    'whitenoise',
+
+    'apps.accounts',
+    'apps.lookups',
+    'apps.contest',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +108,19 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ("ru", "Русский"),
+    ("kk", "Қазақша"),
+]
+
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
+
+
+LOGIN_URL = "/login/ecp/"          # или /login/, если у тебя есть логин по паролю
+LOGIN_REDIRECT_URL = "/"           # куда редирект после успешного входа
+LOGOUT_REDIRECT_URL = "/"          # после logout()
+
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
@@ -121,3 +138,9 @@ CSRF_TRUSTED_ORIGINS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+NCANODE_URL = os.getenv("NCANODE_URL", "http://localhost:14579/cms/verify")
+NCANODE_BASIC_USER = os.getenv("NCANODE_BASIC_USER", "admin")
+NCANODE_BASIC_PASS = os.getenv("NCANODE_BASIC_PASS", "admin")
+
+
+print("NCANODE_URL =", NCANODE_URL)

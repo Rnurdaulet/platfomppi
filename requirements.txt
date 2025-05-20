@@ -44,4 +44,4 @@ openpyxl
 pdfplumber
 django-cors-headers
 shortuuid
-
+requests
