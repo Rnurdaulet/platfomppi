@@ -112,3 +112,59 @@ class EvaluationCriterion(TranslatableNameMixin, models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.code})"
+
+
+class ExpertRegistry(models.Model):
+    """
+    Справочник утверждённых экспертов из внешней базы.
+    Используется для авторизации и назначения ролей при входе.
+    """
+
+    ROLE_CHOICES = [
+        ("expert", "Эксперт"),
+        ("super_expert", "Суперэксперт"),
+    ]
+
+    iin = models.CharField(
+        max_length=12,
+        unique=True,
+        verbose_name="ИИН"
+    )
+
+    last_name = models.CharField(
+        max_length=255,
+        verbose_name="Фамилия"
+    )
+    first_name = models.CharField(
+        max_length=255,
+        verbose_name="Имя"
+    )
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Филиал"
+    )
+
+    role = models.CharField(
+        max_length=32,
+        choices=ROLE_CHOICES,
+        default="expert",
+        verbose_name="Роль"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "lookups_expert_registry"
+        verbose_name = "Эксперт (реестр)"
+        verbose_name_plural = "Эксперты (реестр)"
+        ordering = ["branch", "last_name", "first_name"]
+        indexes = [
+            models.Index(fields=["iin"], name="idx_expert_iin")
+        ]
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.role})"

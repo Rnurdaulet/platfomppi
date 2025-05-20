@@ -43,4 +43,5 @@ psycopg2-binary
 openpyxl
 pdfplumber
 django-cors-headers
+shortuuid
 

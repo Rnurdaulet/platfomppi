@@ -1,7 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import Branch, CompetitionDirection, QualificationCategory
+from .models import Branch, CompetitionDirection, QualificationCategory, EvaluationCriterion, ExpertRegistry
 
 
 @admin.register(Branch)
@@ -53,6 +53,42 @@ class QualificationCategoryAdmin(ModelAdmin):
     fieldsets = (
         (None, {
             "fields": ("name_ru", "name_kk")
+        }),
+        ("Служебная информация", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )
+
+
+@admin.register(EvaluationCriterion)
+class EvaluationCriterionAdmin(ModelAdmin):
+    list_display = ("code", "name_ru", "name_kk", "order", "created_at")
+    search_fields = ("code", "name_ru", "name_kk")
+    ordering = ("order",)
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (None, {
+            "fields": ("code", "name_ru", "name_kk", "description_ru", "description_kk", "order")
+        }),
+        ("Служебное", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )
+
+
+@admin.register(ExpertRegistry)
+class ExpertRegistryAdmin(ModelAdmin):
+    list_display = ("iin", "last_name", "first_name", "role", "branch")
+    search_fields = ("iin", "last_name", "first_name")
+    list_filter = ("role", "branch")
+    ordering = ("branch", "last_name", "first_name")
+    readonly_fields = ("created_at", "updated_at")
+
+    fieldsets = (
+        (None, {
+            "fields": ("iin", "last_name", "first_name", "role", "branch")
         }),
         ("Служебная информация", {
             "fields": ("created_at", "updated_at"),
