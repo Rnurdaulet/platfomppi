@@ -76,3 +76,39 @@ class QualificationCategory(TranslatableNameMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+
+class EvaluationCriterion(TranslatableNameMixin, models.Model):
+    """
+    Справочник критериев оценки заявок.
+    Используется в конкурсах для экспертного оценивания.
+    """
+
+    code = models.CharField(
+        max_length=32,
+        unique=True,
+        verbose_name="Код",
+        help_text="Уникальный системный код, латиницей (например: relevance, clarity)"
+    )
+    name_ru = models.CharField(max_length=255, verbose_name="Название (рус)")
+    name_kk = models.CharField(max_length=255, verbose_name="Атауы (қаз)")
+
+    description_ru = models.TextField(verbose_name="Описание (рус)")
+    description_kk = models.TextField(verbose_name="Сипаттама (қаз)")
+
+    order = models.PositiveSmallIntegerField(default=0, verbose_name="Порядок отображения")
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлён")
+
+    class Meta:
+        db_table = "lookups_evaluation_criterion"
+        verbose_name = "Критерий оценки"
+        verbose_name_plural = "Критерии оценки"
+        ordering = ["order"]
+        indexes = [
+            models.Index(fields=["code"], name="idx_evaluationcriterion_code")
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.code})"
