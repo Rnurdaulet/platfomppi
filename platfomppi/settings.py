@@ -115,6 +115,7 @@ LANGUAGES = [
     ("ru", "Русский"),
     ("kk", "Қазақша"),
 ]
+LANGUAGE_COOKIE_NAME = 'language'
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
 

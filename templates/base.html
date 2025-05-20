@@ -1,5 +1,5 @@
 {% load static i18n %}
-
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -24,15 +24,16 @@
                         {% trans "Выход" %}
                     </button>
                 </form>
-
             {% endif %}
-            <form action="{% url 'set_language' %}" method="post">
+            <form method="post" action="{% url 'set_language' %}" class="inline">
                 {% csrf_token %}
                 <select name="language" onchange="this.form.submit()" class="border rounded text-sm">
                     <option value="ru" {% if LANGUAGE_CODE == 'ru' %}selected{% endif %}>Рус</option>
                     <option value="kk" {% if LANGUAGE_CODE == 'kk' %}selected{% endif %}>Қаз</option>
                 </select>
+                <input type="hidden" name="next" value="{{ request.path }}">
             </form>
+
         </div>
     </div>
 </header>

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Главная" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+
+  <h1 class="text-2xl font-bold mb-4">{% trans "Панорама педагогических идей" %}</h1>
+
+  {% if not request.user.is_authenticated %}
+    <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded">
+      {% trans "Для подачи заявки необходимо войти через ЭЦП." %}
+    </div>
+    <div class="mt-4">
+      <a href="{% url 'ecp_login' %}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        {% trans "Войти через ЭЦП" %}
+      </a>
+    </div>
+
+  {% elif request.user.role == "participant" %}
+    {% if request.user.application %}
+      <div class="border border-gray-300 rounded p-4">
+        <h2 class="text-lg font-semibold mb-2">{% trans "Ваша заявка" %}</h2>
+
+        <p><strong>{% trans "Ф.И.О." %}:</strong> {{ request.user.application.full_name }}</p>
+        <p><strong>{% trans "Филиал" %}:</strong> {{ request.user.application.branch.name }}</p>
+        <p><strong>{% trans "Направление" %}:</strong> {{ request.user.application.direction.name }}</p>
+        <p><strong>{% trans "Статус" %}:</strong>
+          {% if request.user.application.is_locked %}
+            {% trans "Отправлена и подписана" %}
+          {% else %}
+            {% trans "Черновик (не подписана)" %}
+          {% endif %}
+        </p>
+
+        <div class="mt-4">
+          <a href="{% url 'contest:application_preview' %}" class="text-blue-600 hover:underline">
+            {% trans "Перейти к заявке" %}
+          </a>
+        </div>
+      </div>
+    {% else %}
+      <div class="bg-blue-50 border border-blue-200 p-4 rounded">
+        <p class="mb-2">{% trans "Вы ещё не подали заявку." %}</p>
+        <a href="{% url 'contest:application_create' %}"
+           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          {% trans "Подать заявку" %}
+        </a>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
+      {% trans "Вы вошли как эксперт или администратор. Подача заявок доступна только участникам." %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
