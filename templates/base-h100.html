@@ -1,0 +1,79 @@
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="" class="h-100">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>{% block title %}{% trans "Панорама педагогических идей" %}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Required Meta Tags Always Come First -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Title -->
+    <title>Documentation | Front - Multipurpose Responsive Template</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://htmlstream.com/preview/front-v4.3.1/favicon.ico">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="{% static 'theme/vendor.min.css' %}">
+    <!-- CSS Front Template -->
+    <link rel="stylesheet" href="{% static 'theme/theme.min.css' %}">
+    <link rel="stylesheet" href="{% static 'theme/docs.css' %}">
+    <link rel="stylesheet" href="{% static 'theme/fslightbox.css' %}">
+
+    <script src="{% static 'theme/clipboard.min.js' %}"></script>
+    {% block head %}{% endblock %}
+</head>
+<body class="d-flex align-items-center min-h-100">
+<header id="header" class="navbar navbar-expand navbar-light navbar-absolute-top">
+    <div class="container-fluid">
+        <nav class="navbar-nav-wrap">
+            <!-- White Logo -->
+            <a class="navbar-brand d-none d-lg-flex" href="./index.html" aria-label="Front">
+                <img class="navbar-brand-logo" src="{% static 'theme/images/logo.png' %}" alt="Logo"
+                     style=" max-height: 60px; min-width: auto; ">
+            </a>
+            <!-- End White Logo -->
+
+            <!-- Default Logo -->
+            <a class="navbar-brand d-flex d-lg-none" href="./index.html" aria-label="Front">
+                <img class="navbar-brand-logo" src="{% static 'theme/images/logo-mono.png' %}" alt="Logo">
+            </a>
+            <!-- End Default Logo -->
+
+            <div class="ms-auto">
+                <a class="link link-sm link-secondary" href="/">
+                    <i class="bi-chevron-left small ms-1"></i> На главную
+                </a>
+            </div>
+        </nav>
+    </div>
+</header>
+{% block content %}
+    <main id="content" role="main" class="flex-grow-1">
+        <!-- Alerts -->
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-soft-danger{% elif message.tags == 'success' %}alert-soft-success{% else %}alert-soft-secondary{% endif %}"
+                         role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}
+<!-- JS Implementing Plugins -->
+<script src="{% static 'theme/vendor.min.js' %}"></script>
+<!-- JS Front -->
+<script src="{% static 'theme/theme.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

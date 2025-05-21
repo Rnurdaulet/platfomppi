@@ -1,44 +1,179 @@
 {% extends "base.html" %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Подача заявки" %}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-6">
-  <h1 class="text-2xl font-bold mb-6">{% trans "Форма заявки на конкурс" %}</h1>
 
-  <form method="post" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-
-    <div class="grid grid-cols-1 gap-6">
-      {% for field in form.visible_fields %}
-        <div>
-          <label class="block text-sm font-medium text-gray-700" for="{{ field.id_for_label }}">
-            {{ field.label }}{% if field.field.required %} *{% endif %}
-          </label>
-          {{ field }}
-          {% if field.help_text %}
-            <p class="text-xs text-gray-500">{{ field.help_text }}</p>
-          {% endif %}
-          {% for error in field.errors %}
-            <p class="text-sm text-red-600">{{ error }}</p>
-          {% endfor %}
+    <div class="bg-img-start" style="background-image: url({% static 'theme/images/card-11.svg' %});">
+        <div class="container content-space-t-3 content-space-t-lg-5 content-space-b-2">
+            <div class="w-md-75 w-lg-50 text-center mx-md-auto">
+                <h1 class="text-center mb-4">{% trans "Форма заявки на конкурс" %}</h1>
+                <p>{% trans "Пожалуйста, заполните все поля внимательно и корректно — после подписания заявки её нельзя будет изменить." %}</p>
+            </div>
         </div>
-      {% endfor %}
     </div>
 
-    <div class="mt-6 flex justify-between">
-      {% if form.instance and form.instance.can_edit %}
-        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-          {% trans "Сохранить и продолжить" %}
-        </button>
-      {% else %}
-        <a href="{% url 'contest:application_preview' %}" class="text-blue-600 hover:underline">
-          {% trans "Назад к заявке" %}
-        </a>
-      {% endif %}
+    <div class="container content-space-2 content-space-lg-3">
+        <div class="mx-auto" style="max-width: 40rem;">
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <h4 class="text-center mt-4 mb-4"> Об участнике </h4>
+                <div class="mb-3">
+                    <label for="{{ form.full_name.id_for_label }}" class="form-label ">
+                        {{ form.full_name.label }}
+                    </label>
+                    {{ form.full_name }}
+                    {% for error in form.full_name.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label ">
+                                {{ form.email.label }}
+                            </label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label ">
+                                {{ form.phone.label }}
+                            </label>
+                            {{ form.phone }}
+                            {% for error in form.phone.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="{{ form.position.id_for_label }}" class="form-label ">
+                                {{ form.position.label }}
+                            </label>
+                            {{ form.position }}
+                            {% for error in form.position.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="{{ form.qualification.id_for_label }}" class="form-label ">
+                                {{ form.qualification.label }}
+                            </label>
+                            {{ form.qualification }}
+                            {% for error in form.qualification.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+                <h4 class="text-center mt-4 mb-4"> Организация образования </h4>
+                <div class="mb-3">
+                    <label for="{{ form.branch.id_for_label }}" class="form-label ">
+                        {{ form.branch.label }}
+                    </label>
+                    {{ form.branch }}
+                    {% for error in form.branch.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="{{ form.organization_name.id_for_label }}" class="form-label ">
+                        {{ form.organization_name.label }}
+                    </label>
+                    {{ form.organization_name }}
+                    {% for error in form.organization_name.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="{{ form.organization_address.id_for_label }}" class="form-label ">
+                        {{ form.organization_address.label }}
+                    </label>
+                    {{ form.organization_address }}
+                    {% for error in form.organization_address.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <h4 class="text-center mt-4 mb-4"> Конкурс </h4>
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label ">
+                        {{ form.title.label }}
+                    </label>
+                    {{ form.title }}
+                    {% for error in form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="{{ form.direction.id_for_label }}" class="form-label ">
+                        {{ form.direction.label }}
+                    </label>
+                    {{ form.direction }}
+                    {% for error in form.direction.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="{{ form.file.id_for_label }}" class="form-label ">
+                        {{ form.file.label }}
+                    </label>
+                    {{ form.file }}
+                    {% for error in form.file.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="form-check mb-4">
+                    {{ form.consent }}
+                    <label for="{{ form.consent.id_for_label }}" class="form-check-label ">
+                        {{ form.consent.label }}
+                    </label>
+                    {% for error in form.consent.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Кнопка -->
+                <div class="d-grid">
+                    {% if form.instance and form.instance.can_edit %}
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            {% trans "Сохранить и продолжить" %}
+                        </button>
+                    {% else %}
+                        <a href="{% url 'contest:application_preview' %}" class="btn btn-outline-secondary btn-lg">
+                            {% trans "Назад к заявке" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
     </div>
-  </form>
-</div>
 {% endblock %}

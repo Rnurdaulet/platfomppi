@@ -13,7 +13,7 @@ class ApplicationForm(forms.ModelForm):
         exclude = ["uid", "participant", "cms", "is_locked", "submitted_at", "updated_at"]
         widgets = {
             "consent": forms.CheckboxInput(attrs={"class": "checkbox"}),
-            "phone": forms.TextInput(attrs={"type": "tel", "placeholder": "+7 (7XX) XXX-XX-XX"}),
+            "phone": forms.TextInput(attrs={"class":"form-control ","type": "tel", "placeholder": "+7 (7XX) XXX-XX-XX"}),
             "email": forms.EmailInput(),
         }
 
@@ -21,10 +21,93 @@ class ApplicationForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)  # передаём user из views
         super().__init__(*args, **kwargs)
 
-        if self.user and not self.instance.pk:  # Только при создании
+        # Ф.И.О. участника
+        self.fields["full_name"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "Иванов Иван"
+        })
+
+        # Электронная почта
+        self.fields["email"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "email@example.com"
+        })
+
+        # Телефон
+        self.fields["phone"].widget.attrs.update({
+            "class": "form-control ",
+            "type": "tel",
+            "placeholder": "+7 (7XX) XXX-XX-XX"
+        })
+
+        # Должность
+        self.fields["position"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "Учитель информатики"
+        })
+
+        # Квалификационная категория
+        self.fields["qualification"].widget.attrs.update({
+            "class": "form-select "
+        })
+
+        # Филиал
+        self.fields["branch"].widget.attrs.update({
+            "class": "form-select "
+        })
+
+        # Название организации
+        self.fields["organization_name"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "КГУ 'Школа №5'"
+        })
+
+        # Адрес организации
+        self.fields["organization_address"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "г. Алматы, ул. Абая, 25"
+        })
+
+        # Название конкурсного материала
+        self.fields["title"].widget.attrs.update({
+            "class": "form-control ",
+            "placeholder": "Разработка урока по математике"
+        })
+
+        # Направление конкурса
+        self.fields["direction"].widget.attrs.update({
+            "class": "form-select "
+        })
+
+        # Файл заявки
+        self.fields["file"].widget.attrs.update({
+            "class": "form-control "
+        })
+
+        # Согласие
+        self.fields["consent"].widget.attrs.update({
+            "class": "form-check-input"
+        })
+
+        for name, field in self.fields.items():
+            css_class = "form-control "
+            if isinstance(field.widget, forms.CheckboxInput):
+                css_class = "form-check-input"
+            elif isinstance(field.widget, forms.Select):
+                css_class = "form-select "
+
+            if self.errors.get(name):
+                css_class += " is-invalid"
+            elif self.is_bound:
+                css_class += " is-valid"
+
+            field.widget.attrs["class"] = css_class.strip()
+
+        # Автозаполнение ФИО
+        if self.user and not self.instance.pk:
             self.fields["full_name"].initial = f"{self.user.last_name} {self.user.first_name}"
 
-
+        # Блокировка формы при is_locked
         if self.instance and self.instance.is_locked:
             for field in self.fields.values():
                 field.disabled = True

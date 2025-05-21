@@ -7,55 +7,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <title>{% block title %}{% trans "Панорама педагогических идей" %}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Required Meta Tags Always Come First -->
 
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Documentation | Front - Multipurpose Responsive Template</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'theme/images/favicon.ico' %}">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="{% static 'theme/vendor.min.css' %}">
+
+
+    <!-- CSS Front Template -->
+    <link rel="stylesheet" href="{% static 'theme/theme.min.css' %}">
+    <link rel="stylesheet" href="{% static 'theme/docs.css' %}">
+    <link rel="stylesheet" href="{% static 'theme/fslightbox.css' %}">
+
+    <script src="{% static 'theme/clipboard.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-900">
 
-<header class="bg-white shadow">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex gap-4 text-sm items-center">
-            {% if user.is_authenticated %}
-                <span>{% trans "Здравствуйте" %}, {{ user.get_full_name|default:user.username }}</span>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="text-red-600 hover:underline">
-                        {% trans "Выход" %}
-                    </button>
-                </form>
-            {% endif %}
-            <form method="post" action="{% url 'set_language' %}" class="inline">
-                {% csrf_token %}
-                <select name="language" onchange="this.form.submit()" class="border rounded text-sm">
-                    <option value="ru" {% if LANGUAGE_CODE == 'ru' %}selected{% endif %}>Рус</option>
-                    <option value="kk" {% if LANGUAGE_CODE == 'kk' %}selected{% endif %}>Қаз</option>
-                </select>
-                <input type="hidden" name="next" value="{{ request.path }}">
-            </form>
+<!-- Header -->
 
-        </div>
+<header id="header" class="navbar navbar-expand-lg navbar-end navbar-absolute-top navbar-light">
+    <div class="container">
+        <nav class="js-mega-menu navbar-nav-wrap hs-menu-initialized hs-menu-horizontal">
+            <!-- Default Logo -->
+            <a class="navbar-brand" href="/" aria-label="Front">
+                <img class="navbar-brand-logo" src="{% static 'theme/images/logo-mono.png' %}" alt="Logo">
+            </a>
+            <!-- End Default Logo -->
+
+            <!-- Toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-default">
+            <i class="bi-list"></i>
+          </span>
+                <span class="navbar-toggler-toggled">
+            <i class="bi-x"></i>
+          </span>
+            </button>
+            <!-- End Toggler -->
+
+            <!-- Collapse -->
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    {% if not user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'ecp_login' %}">Войти</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'logout' %}" class="me-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-ghost-primary">{% trans "Выход" %}</button>
+                        </form>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'set_language' %}">
+                            {% csrf_token %}
+                            <select name="language" onchange="this.form.submit()" class="form-select form-select-sm">
+                                <option value="ru" {% if LANGUAGE_CODE == 'ru' %}selected{% endif %}>Рус</option>
+                                <option value="kk" {% if LANGUAGE_CODE == 'kk' %}selected{% endif %}>Қаз</option>
+                            </select>
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                        </form>
+                    </li>
+
+
+                </ul>
+            </div>
+            <!-- End Collapse -->
+        </nav>
     </div>
 </header>
 
+<!-- Alerts -->
 {% if messages %}
-    <div class="max-w-4xl mx-auto px-4 mt-4">
+    <div class="container mt-3">
         {% for message in messages %}
-            <div class="p-3 mb-2 rounded border {% if message.tags == 'error' %}border-red-500 bg-red-100 text-red-800{% elif message.tags == 'success' %}border-green-500 bg-green-100 text-green-800{% else %}border-gray-300 bg-white{% endif %}">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-secondary{% endif %}"
+                 role="alert">
                 {{ message }}
             </div>
         {% endfor %}
     </div>
 {% endif %}
 
-<main class="max-w-4xl mx-auto px-4 py-6">
+<!-- Main Content -->
+<main id="content" role="main">
     {% block content %}{% endblock %}
 </main>
 
-<footer class="text-center text-sm text-gray-500 py-4 border-t">
-    &copy; {{ now.year }} {% trans "АО 'Орлеу'" %}
-</footer>
+<!-- ========== FOOTER ========== -->
+<footer class="container text-center content-space-1 d-flex  align-items-center flex-column">
+    <!-- Logo -->
+    <a class="d-inline-flex align-items-center mb-2 gap-4" href="/" aria-label="Front">
+        <img class="brand" src="{% static 'theme/images/logo-orleu.svg' %}" alt="Logo">
+        <img class="brand" src="{% static 'theme/images/logo-mono.png' %}" alt="Logo">
+    </a>
+    <!-- End Logo -->
+    <a class="text-body" href="#">Политика конфиденциальности и Условия использования</a>
+    <p class="small text-muted mb-0">&copy; 2025 «Өрлеу» біліктілікті арттыру ұлттық орталығы» АҚ Все права защищены.
+    </p>
 
+</footer>
+<!-- ========== END FOOTER ========== -->
+
+<!-- JS Implementing Plugins -->
+<script src="{% static 'theme/vendor.min.js' %}"></script>
+
+<!-- JS Front -->
+<script src="{% static 'theme/theme.min.js' %}"></script>
+<script>
+    (function () {
+        // INITIALIZATION OF MEGA MENU
+        // =======================================================
+        new HSMegaMenu('.js-mega-menu', {
+            desktop: {
+                position: 'left'
+            }
+        })
+
+
+        // INITIALIZATION OF BOOTSTRAP VALIDATION
+        // =======================================================
+        HSBsValidation.init('.js-validate', {
+            onSubmit: data => {
+                data.event.preventDefault()
+                alert('Submited')
+            }
+        })
+
+
+        // INITIALIZATION OF BOOTSTRAP DROPDOWN
+        // =======================================================
+        HSBsDropdown.init()
+
+
+        // INITIALIZATION OF GO TO
+        // =======================================================
+        new HSGoTo('.js-go-to')
+
+
+        // INITIALIZATION OF TEXT ANIMATION (TYPING)
+        // =======================================================
+        HSCore.components.HSTyped.init('.js-typedjs')
+    })()
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

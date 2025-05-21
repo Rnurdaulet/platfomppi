@@ -6,74 +6,96 @@
 {% block head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
+
 {% block content %}
-    <div class="max-w-4xl mx-auto py-6">
-        <h1 class="text-2xl font-bold mb-6">{% trans "Проверка заявки перед подачей" %}</h1>
+    <div class="container content-space-t-3 content-space-lg-4 content-space-b-2">
+        <div class="row">
+            <div class="col-lg-6 mb-7 mb-lg-0">
+                <div class="bg-light p-4 rounded-3 h-100 d-flex align-items-center justify-content-center">
+                    <img class="img-fluid" src="{% static 'img/file-preview.svg' %}" alt="Preview">
+                </div>
+            </div>
 
-        <dl class="grid grid-cols-1 gap-4 text-sm">
-            <dt class="font-semibold">{% trans "Ф.И.О. участника" %}</dt>
-            <dd>{{ application.full_name }}</dd>
+            <div class="col-lg-6">
+                <div class="ps-lg-4">
+                    <div class="mb-5">
+                        <h1 class="h2 mb-3">{% trans "Проверка заявки перед подачей" %}</h1>
+                        <p class="text-muted">
+                            {% trans "Проверьте все данные перед отправкой. После подписания заявку изменить будет невозможно." %}
+                        </p>
+                    </div>
 
-            <dt class="font-semibold">{% trans "Филиал" %}</dt>
-            <dd>{{ application.branch.name }}</dd>
+                    <dl class="row">
+                        <dt class="col-sm-5">{% trans "Ф.И.О. участника" %}</dt>
+                        <dd class="col-sm-7">{{ application.full_name }}</dd>
 
-            <dt class="font-semibold">{% trans "Направление конкурса" %}</dt>
-            <dd>{{ application.direction.name }}</dd>
+                        <dt class="col-sm-5">{% trans "Филиал" %}</dt>
+                        <dd class="col-sm-7">{{ application.branch.name }}</dd>
 
-            <dt class="font-semibold">{% trans "Квалификационная категория" %}</dt>
-            <dd>{{ application.qualification.name }}</dd>
 
-            <dt class="font-semibold">{% trans "Должность" %}</dt>
-            <dd>{{ application.position }}</dd>
+                        <dt class="col-sm-5">{% trans "Квалификационная категория" %}</dt>
+                        <dd class="col-sm-7">{{ application.qualification.name }}</dd>
 
-            <dt class="font-semibold">{% trans "Организация" %}</dt>
-            <dd>{{ application.organization_name }}</dd>
+                        <dt class="col-sm-5">{% trans "Должность" %}</dt>
+                        <dd class="col-sm-7">{{ application.position }}</dd>
 
-            <dt class="font-semibold">{% trans "Адрес организации" %}</dt>
-            <dd>{{ application.organization_address }}</dd>
+                        <dt class="col-sm-5">{% trans "Организация" %}</dt>
+                        <dd class="col-sm-7">{{ application.organization_name }}</dd>
 
-            <dt class="font-semibold">{% trans "Электронная почта" %}</dt>
-            <dd>{{ application.email }}</dd>
+                        <dt class="col-sm-5">{% trans "Адрес организации" %}</dt>
+                        <dd class="col-sm-7">{{ application.organization_address }}</dd>
 
-            <dt class="font-semibold">{% trans "Телефон" %}</dt>
-            <dd>{{ application.phone }}</dd>
+                        <dt class="col-sm-5">{% trans "Электронная почта" %}</dt>
+                        <dd class="col-sm-7">{{ application.email }}</dd>
 
-            <dt class="font-semibold">{% trans "Название конкурсного материала" %}</dt>
-            <dd>{{ application.title }}</dd>
+                        <dt class="col-sm-5">{% trans "Телефон" %}</dt>
+                        <dd class="col-sm-7">{{ application.phone }}</dd>
 
-            <dt class="font-semibold">{% trans "Файл" %}</dt>
-            <dd><a class="text-blue-600 hover:underline" href="{{ application.file.url }}"
-                   target="_blank">{% trans "Скачать файл" %}</a></dd>
-        </dl>
+                        <dt class="col-sm-5">{% trans "Название конкурсного материала" %}</dt>
+                        <dd class="col-sm-7">{{ application.title }}</dd>
 
-        <div class="mt-8 flex gap-4">
-            {% if not application.is_locked %}
-                <a href="{% url 'contest:application_edit' %}" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
-                    {% trans "Изменить" %}
-                </a>
+                        <dt class="col-sm-5">{% trans "Направление конкурса" %}</dt>
+                        <dd class="col-sm-7">{{ application.direction.name }}</dd>
 
-                <button id="signButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                    {% trans "Подписать и отправить" %}
-                </button>
-            {% else %}
-                <span class="text-green-700 font-semibold">{% trans "Заявка уже подписана и отправлена." %}</span>
-            {% endif %}
+                        <dt class="col-sm-5">{% trans "Файл" %}</dt>
+                        <dd class="col-sm-7">
+                            <a href="{{ application.file.url }}" target="_blank" class="btn btn-soft-primary btn-sm">
+                                <i class="bi bi-download me-1"></i> {% trans "Скачать файл" %}
+                            </a>
+                        </dd>
+                    </dl>
+
+                    {% if not application.is_locked %}
+                        <div class="d-flex gap-2 mt-4">
+                            <a href="{% url 'contest:application_edit' %}" class="btn btn-outline-secondary">
+                                {% trans "Изменить" %}
+                            </a>
+                            <button id="signButton" class="btn btn-primary">
+                                {% trans "Подписать и отправить" %}
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success mt-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            {% trans "Заявка уже подписана и отправлена." %}
+                        </div>
+                    {% endif %}
+
+                    <div id="status" class="form-text mt-3 text-muted"></div>
+                </div>
+            </div>
         </div>
-
-        <div id="status" class="mt-4 text-sm text-gray-500"></div>
     </div>
 {% endblock %}
 
 {% block scripts %}
     {% if not application.is_locked %}
-
-        давай
         <script id="sign-config" type="application/json">
             {
-                "endpoint": "{% url 'contest:application_sign' %}",
-                "csrf": "{{ csrf_token }}",
-                "uid": "{{ application.uid }}"
-              }
+              "endpoint": "{% url 'contest:application_sign' %}",
+        "csrf": "{{ csrf_token }}",
+        "uid": "{{ application.uid }}"
+      }
         </script>
         <script src="{% static 'js/ncalayer-client.js' %}"></script>
         <script src="{% static 'js/sign_application.js' %}"></script>
