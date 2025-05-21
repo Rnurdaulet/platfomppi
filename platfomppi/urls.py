@@ -13,6 +13,8 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path("", lambda request: render(request, "index.html"), name="home"),
+    path("privacy", lambda request: render(request, "privacy.html"), name="privacy"),
+    path("404", lambda request: render(request, "404.html"), name="404"),
     path("", include("apps.accounts.urls")),
     path("contest/", include("apps.contest.urls", namespace="contest")),
 )

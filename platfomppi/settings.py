@@ -145,3 +145,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 NCANODE_URL = os.getenv("NCANODE_URL", "http://localhost:14579/cms/verify")
 NCANODE_BASIC_USER = os.getenv("NCANODE_BASIC_USER", "admin")
 NCANODE_BASIC_PASS = os.getenv("NCANODE_BASIC_PASS", "admin")
+
+
+HANDLER404 = "platfomppi.views.handler404"
