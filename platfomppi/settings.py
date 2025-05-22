@@ -1,10 +1,13 @@
 import os
 from pathlib import Path
+from datetime import date
+from dotenv import load_dotenv
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3jp6k1kvrw+r!c18kjj17=f8d#)+o+=5o!=25=*_az9$s_dlgt'
 
-from dotenv import load_dotenv
+
 load_dotenv()
 
 DEBUG = os.getenv("DEBUG", "0") == "1"
@@ -119,7 +122,11 @@ LANGUAGE_COOKIE_NAME = 'language'
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://rr.orleu.edu.kz",
+]
 
 LOGIN_URL = "/login/ecp/"          # или /login/, если у тебя есть логин по паролю
 LOGIN_REDIRECT_URL = "/"           # куда редирект после успешного входа
@@ -130,13 +137,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # откуда collectstatic будет брать файлы
-]
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://rr.orleu.edu.kz",
+    BASE_DIR / "static",
 ]
 
 MEDIA_URL = '/media/'
@@ -146,8 +147,18 @@ NCANODE_URL = os.getenv("NCANODE_URL", "http://localhost:14579/cms/verify")
 NCANODE_BASIC_USER = os.getenv("NCANODE_BASIC_USER", "admin")
 NCANODE_BASIC_PASS = os.getenv("NCANODE_BASIC_PASS", "admin")
 
-
 HANDLER404 = "platfomppi.views.handler404"
 
-from datetime import date
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
 APPLICATION_EDIT_DEADLINE = date(2025, 5, 23)
