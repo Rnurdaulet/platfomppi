@@ -1,22 +1,32 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
+from datetime import date
+import json
+
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
-from django.conf import settings
-from datetime import date
-from apps.contest.models import Application
+from django.views import View
+
 from apps.contest.forms import ApplicationForm
+from apps.contest.models import Application
 from utils.nca import verify_ecp_signature
+
 
 class ParticipantRequiredMixin(LoginRequiredMixin):
     """Доступ только участникам"""
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.role != "participant":
-            return HttpResponseForbidden("Доступ только для участников.")
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if request.user.role != "participant":
+            return render(request, "403_participant_only.html", status=403)
+
         return super().dispatch(request, *args, **kwargs)
+
 
 class ApplicationCreateView(ParticipantRequiredMixin, View):
     """Создание новой заявки"""
@@ -26,7 +36,7 @@ class ApplicationCreateView(ParticipantRequiredMixin, View):
 
         can_create = date.today() < getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max)
         if not can_create:
-            messages.error(request, _("Время приема заявок закрыт!"))
+            messages.error(request, _("Приём заявок завершён."))
             return redirect("home")
 
         form = ApplicationForm(user=request.user)
@@ -45,11 +55,12 @@ class ApplicationCreateView(ParticipantRequiredMixin, View):
             return redirect("contest:application_preview")
         return render(request, "contest/application_form.html", {"form": form})
 
+
 class ApplicationUpdateView(ParticipantRequiredMixin, View):
     """Редактирование черновика"""
     def get(self, request):
-        app = request.user.application
-        if not app.can_edit():
+        app = getattr(request.user, "application", None)
+        if not app or not app.can_edit():
             messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
 
@@ -57,8 +68,8 @@ class ApplicationUpdateView(ParticipantRequiredMixin, View):
         return render(request, "contest/application_form.html", {"form": form})
 
     def post(self, request):
-        app = request.user.application
-        if not app.can_edit():
+        app = getattr(request.user, "application", None)
+        if not app or not app.can_edit():
             messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
 
@@ -69,16 +80,24 @@ class ApplicationUpdateView(ParticipantRequiredMixin, View):
             return redirect("contest:application_preview")
         return render(request, "contest/application_form.html", {"form": form})
 
+
 class ApplicationPreviewView(ParticipantRequiredMixin, View):
     """Просмотр заявки перед подписью"""
     def get(self, request):
-        app = request.user.application
+        app = getattr(request.user, "application", None)
+        if not app:
+            messages.warning(request, _("Вы ещё не подали заявку."))
+            return redirect("contest:application_create")
         return render(request, "contest/application_preview.html", {"application": app})
+
 
 class ApplicationSignView(ParticipantRequiredMixin, View):
     """Подписание заявки — POST с CMS-подписью"""
     def post(self, request):
-        import json
+        app = getattr(request.user, "application", None)
+        if not app:
+            return JsonResponse({"success": False, "message": _("Заявка не найдена.")}, status=404)
+
         try:
             data = json.loads(request.body)
             cms = data.get("signedData")
@@ -87,7 +106,6 @@ class ApplicationSignView(ParticipantRequiredMixin, View):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=400)
 
-        app = request.user.application
         if app.is_locked:
             return JsonResponse({"success": False, "message": _("Заявка уже подписана.")}, status=400)
 
@@ -99,5 +117,3 @@ class ApplicationSignView(ParticipantRequiredMixin, View):
         app.save()
 
         return JsonResponse({"success": True, "redirectUrl": "/"})
-
-

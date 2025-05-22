@@ -177,4 +177,49 @@
             </form>
         </div>
     </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const phoneInput = document.getElementById("phone");
+
+  phoneInput.addEventListener("input", formatPhone);
+  phoneInput.addEventListener("blur", clearIncomplete);
+
+  function formatPhone(e) {
+    let input = e.target;
+    let digits = input.value.replace(/\D/g, "").substring(0, 11);
+
+    let formatted = "";
+
+    if (digits.length === 0) {
+      formatted = "";
+    } else {
+      formatted = "+7";
+
+      if (digits.length >= 2) {
+        formatted += " (" + digits.substring(1, 4);
+      }
+      if (digits.length >= 5) {
+        formatted += ") " + digits.substring(4, 7);
+      }
+      if (digits.length >= 8) {
+        formatted += "-" + digits.substring(7, 9);
+      }
+      if (digits.length >= 10) {
+        formatted += "-" + digits.substring(9, 11);
+      }
+    }
+
+    input.value = formatted;
+  }
+
+  function clearIncomplete(e) {
+    const digits = e.target.value.replace(/\D/g, "");
+    if (digits.length < 11) {
+      e.target.value = "";
+    }
+  }
+});
+</script>
+
+
 {% endblock %}

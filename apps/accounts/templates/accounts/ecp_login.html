@@ -33,6 +33,7 @@
                         <div class="text-center mb-5">
                             <h1 class="h2 fw-bold text-primary-gradient">{% trans "Вход с использованием ЭЦП" %}</h1>
                             <p class="text-muted">{% trans "Авторизуйтесь безопасно, используя NCAlayer для подписи." %}</p>
+                                <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
                         </div>
 
                         <form novalidate>
@@ -42,9 +43,9 @@
                                 <button type="button" id="signButton"
                                         class="btn btn-primary btn-lg">{% trans "Войти через ЭЦП" %}</button>
                             </div>
-                            <div id="status" class="small text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
+                            <div id="status" class="small text-center text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
                         </form>
-                        <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
+
 
 
                         <div class="text-center mt-4">

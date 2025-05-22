@@ -35,7 +35,7 @@ class Branch(TranslatableNameMixin, models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} ({self.bin})"
+        return f"{self.name}"
 
 
 class CompetitionDirection(TranslatableNameMixin, models.Model):

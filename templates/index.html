@@ -83,11 +83,13 @@
                                         </div>
                                         <!-- End Col -->
                                         <div class="col-sm-6 mb-4 mb-sm-0">
-                                            <span>               {% if request.user.application.is_locked %}
-                                                {% trans "Отправлена и подписана" %}
-                                            {% else %}
-                                                {% trans "Черновик (не подписана)" %}
-                                            {% endif %}</span>
+                                            <span>
+                                                  {% trans "Отправлена" %}
+{#                                                {% if request.user.application.is_locked %}#}
+{#                                                {% trans "Отправлена" %}#}
+{#                                            {% else %}#}
+{#                                                {% trans "Черновик (не подписана)" %}#}
+{#                                            {% endif %}</span>#}
                                         </div>
                                         <!-- End Col -->
                                     </div>

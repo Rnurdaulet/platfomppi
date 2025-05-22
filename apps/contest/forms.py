@@ -13,7 +13,10 @@ class ApplicationForm(forms.ModelForm):
         exclude = ["uid", "participant", "cms", "is_locked", "submitted_at", "updated_at"]
         widgets = {
             "consent": forms.CheckboxInput(attrs={"class": "checkbox"}),
-            "phone": forms.TextInput(attrs={"class":"form-control ","type": "tel", "placeholder": "+7 (7XX) XXX-XX-XX"}),
+            "phone": forms.TextInput(attrs={   "class": "form-control form-control-lg",
+    "type": "tel",
+    "placeholder": "+7 (7XX) XXX-XX-XX",
+    "id": "phone"}),
             "email": forms.EmailInput(),
         }
 
@@ -88,6 +91,10 @@ class ApplicationForm(forms.ModelForm):
         self.fields["consent"].widget.attrs.update({
             "class": "form-check-input"
         })
+        self.fields["consent"].required = True
+        self.fields["consent"].error_messages = {
+            "required": "Необходимо дать согласие на обработку персональных данных."
+        }
 
         for name, field in self.fields.items():
             css_class = "form-control "
