@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _, gettext
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
+from apps.contest.models import Application
 from apps.lookups.models import ExpertRegistry
 from apps.accounts.models import User
 from utils.nca import verify_ecp_signature
@@ -60,4 +61,19 @@ class EcpLoginView(View):
             )
 
         login(request, user)
+        # Проверка наличия заявки
+        if user.role == "participant":
+            has_application = Application.objects.filter(participant=user).exists()
+            if not has_application:
+                return JsonResponse({"success": True, "redirectUrl": "/contest/create/"})
+
+        #  Если есть заявка или он эксперт — на главную
         return JsonResponse({"success": True, "redirectUrl": "/"})
+
+
+from django.conf import settings
+from datetime import date
+
+def index(request):
+    can_create = date.today() < getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max)
+    return render(request, "index.html", {"can_create": can_create})

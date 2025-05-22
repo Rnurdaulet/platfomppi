@@ -7,53 +7,54 @@
     <meta name="csrf-token" content="{{ csrf_token }}">{% endblock %}
 
 {% block content %}
+    <main id="content" role="main" class="flex-grow-1">
+        {% include "includes/alerts.html" %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-5 col-xl-4 d-none d-lg-flex justify-content-center align-items-center min-vh-lg-100 position-relative "
+                     style="    background-size: cover; background-image: url({% static 'theme/images/33.png' %});">
+                    <div class="flex-grow-1 p-5">
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-5 col-xl-4 d-none d-lg-flex justify-content-center align-items-center min-vh-lg-100 position-relative "
-                 style="    background-size: cover; background-image: url({% static 'theme/images/33.png' %});">
-                <div class="flex-grow-1 p-5">
-
-                    <div class="position-absolute start-0 end-0 bottom-0 text-center p-5">
-                        <div class="row justify-content-center">
-                            <div class="col text-center py-3">
-                                <img class="avatar avatar-lg avatar-4x3"
-                                     src="{% static 'theme/images/logo-orleu-w.svg' %}" alt="Logo">
+                        <div class="position-absolute start-0 end-0 bottom-0 text-center p-5">
+                            <div class="row justify-content-center">
+                                <div class="col text-center py-3">
+                                    <img class="avatar avatar-lg avatar-4x3"
+                                         src="{% static 'theme/images/logo-orleu-w.svg' %}" alt="Logo">
+                                </div>
+                                <!-- End Col -->
                             </div>
-                            <!-- End Col -->
+                            <!-- End Row -->
                         </div>
-                        <!-- End Row -->
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-7 col-xl-8 d-flex justify-content-center align-items-center min-vh-lg-100">
-                <div class="flex-grow-1 mx-auto" style="max-width: 28rem;">
-                    <div class="text-center mb-5">
-                        <h1 class="h2 fw-bold text-primary-gradient">{% trans "Вход с использованием ЭЦП" %}</h1>
-                        <p class="text-muted">{% trans "Авторизуйтесь безопасно, используя NCAlayer для подписи." %}</p>
-                    </div>
-
-                    <form novalidate>
-                        <input type="hidden" id="groupid" value="{{ nonce }}">
-
-                        <div class="d-grid mb-3">
-                            <button type="button" id="signButton"
-                                    class="btn btn-primary btn-lg">{% trans "Войти через ЭЦП" %}</button>
+                <div class="col-lg-7 col-xl-8 d-flex justify-content-center align-items-center min-vh-lg-100">
+                    <div class="flex-grow-1 mx-auto" style="max-width: 28rem;">
+                        <div class="text-center mb-5">
+                            <h1 class="h2 fw-bold text-primary-gradient">{% trans "Вход с использованием ЭЦП" %}</h1>
+                            <p class="text-muted">{% trans "Авторизуйтесь безопасно, используя NCAlayer для подписи." %}</p>
                         </div>
-                                            <div id="status" class="small text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
-                    </form>
-                    <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
+
+                        <form novalidate>
+                            <input type="hidden" id="groupid" value="{{ nonce }}">
+
+                            <div class="d-grid mb-3">
+                                <button type="button" id="signButton"
+                                        class="btn btn-primary btn-lg">{% trans "Войти через ЭЦП" %}</button>
+                            </div>
+                            <div id="status" class="small text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
+                        </form>
+                        <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
 
 
-                    <div class="text-center mt-4">
-                        <a href="#" class="small text-primary">{% trans "Нужна помощь с ЭЦП?" %}</a>
+                        <div class="text-center mt-4">
+                            <a href="#" class="small text-primary">{% trans "Нужна помощь с ЭЦП?" %}</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </main>
 {% endblock %}
 
 {% block scripts %}

@@ -1,14 +1,15 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseForbidden
 from django.utils.translation import gettext as _
-
+from django.conf import settings
+from datetime import date
 from apps.contest.models import Application
 from apps.contest.forms import ApplicationForm
 from utils.nca import verify_ecp_signature
-
 
 class ParticipantRequiredMixin(LoginRequiredMixin):
     """Доступ только участникам"""
@@ -17,12 +18,16 @@ class ParticipantRequiredMixin(LoginRequiredMixin):
             return HttpResponseForbidden("Доступ только для участников.")
         return super().dispatch(request, *args, **kwargs)
 
-
 class ApplicationCreateView(ParticipantRequiredMixin, View):
     """Создание новой заявки"""
     def get(self, request):
         if hasattr(request.user, "application"):
             return redirect("contest:application_edit")
+
+        can_create = date.today() < getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max)
+        if not can_create:
+            messages.error(request, _("Время приема заявок закрыт!"))
+            return redirect("home")
 
         form = ApplicationForm(user=request.user)
         return render(request, "contest/application_form.html", {"form": form})
@@ -40,12 +45,12 @@ class ApplicationCreateView(ParticipantRequiredMixin, View):
             return redirect("contest:application_preview")
         return render(request, "contest/application_form.html", {"form": form})
 
-
 class ApplicationUpdateView(ParticipantRequiredMixin, View):
     """Редактирование черновика"""
     def get(self, request):
         app = request.user.application
-        if app.is_locked:
+        if not app.can_edit():
+            messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
 
         form = ApplicationForm(instance=app, user=request.user)
@@ -53,7 +58,8 @@ class ApplicationUpdateView(ParticipantRequiredMixin, View):
 
     def post(self, request):
         app = request.user.application
-        if app.is_locked:
+        if not app.can_edit():
+            messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
 
         form = ApplicationForm(request.POST, request.FILES, instance=app, user=request.user)
@@ -63,13 +69,11 @@ class ApplicationUpdateView(ParticipantRequiredMixin, View):
             return redirect("contest:application_preview")
         return render(request, "contest/application_form.html", {"form": form})
 
-
 class ApplicationPreviewView(ParticipantRequiredMixin, View):
     """Просмотр заявки перед подписью"""
     def get(self, request):
         app = request.user.application
         return render(request, "contest/application_preview.html", {"application": app})
-
 
 class ApplicationSignView(ParticipantRequiredMixin, View):
     """Подписание заявки — POST с CMS-подписью"""

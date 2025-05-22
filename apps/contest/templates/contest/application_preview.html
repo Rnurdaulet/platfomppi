@@ -5,19 +5,16 @@
 
 {% block head %}
     <meta name="csrf-token" content="{{ csrf_token }}">
-
-       <script src="{% static 'https://cdn.jsdelivr.net/npm/docx-preview/dist/docx-preview.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+
     <div class="container content-space-t-3 content-space-lg-4 content-space-b-2">
+        {% include "includes/alerts.html" %}
         <div class="row">
             <div class="col-lg-6 mb-7 mb-lg-0">
-
-                    <img class="img-fluid rounded-3" src="{% static 'theme/images/qq.png' %}" alt="Preview">
-
+                <img class="img-fluid rounded-3" src="{% static 'theme/images/done.png' %}" alt="Preview">
             </div>
-
             <div class="col-lg-6">
                 <div class="ps-lg-4">
                     <div class="mb-5">
@@ -33,7 +30,6 @@
 
                         <dt class="col-sm-5">{% trans "Филиал" %}</dt>
                         <dd class="col-sm-7">{{ application.branch.name }}</dd>
-
 
                         <dt class="col-sm-5">{% trans "Квалификационная категория" %}</dt>
                         <dd class="col-sm-7">{{ application.qualification.name }}</dd>
@@ -69,17 +65,19 @@
 
                     {% if not application.is_locked %}
                         <div class="d-flex gap-2 mt-4">
-                            <a href="{% url 'contest:application_edit' %}" class="btn btn-outline-secondary">
-                                {% trans "Изменить" %}
-                            </a>
-                            <button id="signButton" class="btn btn-primary">
-                                {% trans "Подписать и отправить" %}
-                            </button>
+                            {% if  application.can_edit %}
+                                <a href="{% url 'contest:application_edit' %}" class="btn btn-outline-secondary">
+                                    {% trans "Изменить" %}
+                                </a>
+                            {% endif %}
+                            {#                            <button id="signButton" class="btn btn-primary">#}
+                            {#                                {% trans "Подписать и отправить" %}#}
+                            {#                            </button>#}
                         </div>
                     {% else %}
                         <div class="alert alert-success mt-4" role="alert">
                             <i class="bi bi-check-circle-fill me-1"></i>
-                            {% trans "Заявка уже подписана и отправлена." %}
+                            {% trans "Заявка и отправлена." %}
                         </div>
                     {% endif %}
 

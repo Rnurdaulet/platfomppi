@@ -148,3 +148,6 @@ NCANODE_BASIC_PASS = os.getenv("NCANODE_BASIC_PASS", "admin")
 
 
 HANDLER404 = "platfomppi.views.handler404"
+
+from datetime import date
+APPLICATION_EDIT_DEADLINE = date(2025, 5, 23)

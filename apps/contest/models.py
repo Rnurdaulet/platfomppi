@@ -3,11 +3,11 @@ from apps.accounts.models import User
 from apps.lookups.models import Branch, CompetitionDirection, QualificationCategory
 from apps.contest.validators import validate_word_file
 from apps.contest.utils import generate_short_uid
-
+from django.conf import settings
+from datetime import date
 
 def application_upload_path(instance, filename):
-    return f"applications/{instance.participant.username}/{filename}"
-
+    return f"applications/{instance.uid}/{filename}"
 
 class Application(models.Model):
     """
@@ -64,7 +64,7 @@ class Application(models.Model):
     file = models.FileField(
         upload_to=application_upload_path,
         validators=[validate_word_file],
-        verbose_name="Файл заявки (.docx)",
+        verbose_name="Файл заявки (.docx/.doc)",
         help_text="Формат .docx/.doc, до 5 МБ"
     )
 
@@ -92,4 +92,7 @@ class Application(models.Model):
         return f"{self.uid} — {self.full_name} — {self.title}"
 
     def can_edit(self) -> bool:
-        return not self.is_locked
+        """Можно ли редактировать заявку"""
+        if self.is_locked:
+            return False
+        return date.today() < getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max)

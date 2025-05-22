@@ -8,6 +8,7 @@
     <!-- Hero -->
     <div class="overflow-hidden">
         <div class="container content-space-t-4 content-space-b-3">
+            {% include "includes/alerts.html" %}
             <div class="row justify-content-lg-between align-items-md-center">
                 <div class="col-md-6 col-lg-5 mb-7 mb-md-0">
                     <!-- Heading -->
@@ -19,7 +20,6 @@
                     </div>
 
                     {% if not request.user.is_authenticated %}
-
                         <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded">
                             {% trans "Для подачи заявки необходимо войти через ЭЦП." %}
                         </div>
@@ -29,10 +29,8 @@
                                 {% trans "Войти через ЭЦП" %}
                             </a>
                         </div>
-
                     {% elif request.user.role == "participant" %}
                         {% if request.user.application %}
-
                             <!-- Heading -->
                             <div class="w-lg-75 text-center mx-auto mb-sm-9">
                                 <h2 class="h1">{% trans "Ваша заявка" %}</h2>
@@ -104,15 +102,20 @@
                             </ul>
                             <!-- End List Striped -->
                         {% else %}
-                            <div class="bg-blue-50 border border-blue-200 p-4 rounded">
-                                <p class="mb-2">{% trans "Вы ещё не подали заявку." %}</p>
-                                <a href="{% url 'contest:application_create' %}"
-                                   class="btn btn-primary btn-transition">
-                                    {% trans "Подать заявку" %}
-                                </a>
-                            </div>
-
-
+                            {% if can_create %}
+                                <div class="bg-blue-50 border border-blue-200 p-4 rounded">
+                                    <p class="mb-2">{% trans "Вы ещё не подали заявку." %}</p>
+                                    <a href="{% url 'contest:application_create' %}"
+                                       class="btn btn-primary btn-transition">
+                                        {% trans "Подать заявку" %}
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-soft-danger" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                    {% trans "Подача заявок завершена." %}
+                                </div>
+                            {% endif %}
                         {% endif %}
 
                     {% else %}
@@ -120,14 +123,9 @@
                             {% trans "Вы вошли как эксперт или администратор. Подача заявок доступна только участникам." %}
                         </div>
                     {% endif %}
-
-
                     <!-- End Title & Description -->
-
-
                 </div>
                 <!-- End Col -->
-
                 <div class="col-md-6">
                     <div class="position-relative">
                         <img class="img-fluid rounded-2" width="650" height="650"

@@ -5,7 +5,9 @@
 {% block title %}{% trans "404" %}{% endblock %}
 
 {% block content %}
+
 <div class="container text-center">
+    {% include "includes/alerts.html" %}
       <div class="mb-3">
         <img class="img-fluid" src="{% static 'theme/images/404.png' %}" alt="Image 404" style="width: 30rem;">
       </div>
