@@ -50,7 +50,7 @@ MIDDLEWARE = [
 
 AUTH_USER_MODEL = "accounts.User"
 
-ROOT_URLCONF = 'platfomppi.urls'
+ROOT_URLCONF = 'platformppi.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'platfomppi.wsgi.application'
+WSGI_APPLICATION = 'platformppi.wsgi.application'
 
 
 DATABASES = {
@@ -147,7 +147,7 @@ NCANODE_URL = os.getenv("NCANODE_URL", "http://localhost:14579/cms/verify")
 NCANODE_BASIC_USER = os.getenv("NCANODE_BASIC_USER", "admin")
 NCANODE_BASIC_PASS = os.getenv("NCANODE_BASIC_PASS", "admin")
 
-HANDLER404 = "platfomppi.views.handler404"
+HANDLER404 = "platformppi.views.handler404"
 
 CACHES = {
     "default": {
