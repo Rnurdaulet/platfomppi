@@ -45,3 +45,4 @@ pdfplumber
 django-cors-headers
 shortuuid
 requests
+django-redis
