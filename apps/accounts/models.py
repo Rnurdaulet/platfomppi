@@ -41,6 +41,11 @@ class User(AbstractUser):
             return getattr(self, "participant_profile", None)
         return None
 
+    @property
+    def current_application(self):
+        return self.applications.first()
+
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 

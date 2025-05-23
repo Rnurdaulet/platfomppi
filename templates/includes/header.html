@@ -30,6 +30,21 @@
                         </li>
                     {% endif %}
                     {% if user.is_authenticated %}
+                        {% if request.user.role == "participant" %}
+                            {% with application=request.user.applications.first %}
+                                {{ application }}
+                                {% if application %}
+                                    <li class="nav-item">
+                                        <a class="nav-link " href="{% url 'contest:application_preview' %}">Моя заявка</a>
+                                    </li>
+                                {% else %}
+                                    <li class="nav-item">
+                                        <a class="nav-link "
+                                           href="{% url 'contest:application_create' %}">  {% trans "Подать заявку" %}</a>
+                                    </li>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
                         <form method="post" action="{% url 'logout' %}" class="me-3">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-ghost-primary">{% trans "Выход" %}</button>
