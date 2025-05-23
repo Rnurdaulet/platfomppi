@@ -10,6 +10,13 @@ class Region(TranslatableNameMixin, models.Model):
     name_ru = models.CharField(max_length=255, verbose_name="Название региона (рус)")
     name_kk = models.CharField(max_length=255, verbose_name="Атауы (қаз)")
     code = models.CharField(max_length=10, unique=True, verbose_name="Код региона")
+    external_id = models.CharField(
+        max_length=64,
+        verbose_name="Внешний ID",
+        help_text="ID из внешней системы (например, ЕБДП)",
+        null=True,
+        blank=True
+    )
 
     class Meta:
         db_table = "lookups_region"
@@ -196,3 +203,100 @@ class ExpertRegistry(models.Model):
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.role})"
+
+
+class Subject(TranslatableNameMixin, models.Model):
+    name_ru = models.CharField(max_length=255, verbose_name="Название (рус.)")
+    name_kk = models.CharField(max_length=255, verbose_name="Атауы (қаз.)")
+    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+
+    class Meta:
+        db_table = "lookup_subject"
+        verbose_name = "Предмет"
+        verbose_name_plural = "Предметы"
+        ordering = ["name_ru"]
+
+    def __str__(self):
+        return self.name_ru
+
+
+class SchoolType(TranslatableNameMixin, models.Model):
+    name_ru = models.CharField(max_length=255, verbose_name="Тип организации (рус.)")
+    name_kk = models.CharField(max_length=255, verbose_name="Ұйым түрі (қаз.)")
+    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+
+    class Meta:
+        db_table = "lookup_school_type"
+        verbose_name = "Тип учебной организации"
+        verbose_name_plural = "Типы учебных организаций"
+        ordering = ["external_id"]
+
+    def __str__(self):
+        return self.name_ru
+
+
+class SchoolForm(TranslatableNameMixin, models.Model):
+    name_ru = models.CharField(max_length=255, verbose_name="Форма (рус.)")
+    name_kk = models.CharField(max_length=255, verbose_name="Форма (қаз.)")
+    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+
+    class Meta:
+        db_table = "lookup_school_form"
+        verbose_name = "Форма организации"
+        verbose_name_plural = "Формы организаций"
+        ordering = ["external_id"]
+
+    def __str__(self):
+        return self.name_ru
+
+
+class Location(TranslatableNameMixin, models.Model):
+    name_ru = models.CharField(max_length=255, verbose_name="Форма (рус.)")
+    name_kk = models.CharField(max_length=255, verbose_name="Форма (қаз.)")
+    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+
+    class Meta:
+        db_table = "lookup_location"
+        verbose_name = "Населённый пункт / Район"
+        verbose_name_plural = "Населённые пункты / Районы"
+        ordering = ["external_id"]
+
+    def __str__(self):
+        return self.name_ru
+
+
+class Position(TranslatableNameMixin, models.Model):
+    name_ru = models.CharField(max_length=255, verbose_name="Должность (рус.)")
+    name_kk = models.CharField(max_length=255, verbose_name="Лауазымы (қаз.)")
+    external_id = models.CharField(max_length=32, unique=True)
+
+    class Meta:
+        db_table = "lookup_position"
+        verbose_name = "Должность"
+        verbose_name_plural = "Должности"
+        ordering = ["name_ru"]
+
+    def __str__(self):
+        return self.name_ru
+
+
+class School(models.Model):
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, verbose_name="Регион")
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True,
+                                 verbose_name="Населённый пункт / Район")
+    name_kk = models.CharField(max_length=512, verbose_name="Атауы (қаз.)")
+    name_ru = models.CharField(max_length=512, verbose_name="Название (рус.)")
+
+    school_type = models.ForeignKey(SchoolType, on_delete=models.SET_NULL, null=True, verbose_name="Тип организации")
+    school_form = models.ForeignKey(SchoolForm, on_delete=models.SET_NULL, null=True, verbose_name="Форма организации")
+
+    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+
+    class Meta:
+        db_table = "lookup_school"
+        verbose_name = "Школа / Учреждение"
+        verbose_name_plural = "Школы / Учреждения"
+        ordering = ["name_ru"]
+
+    def __str__(self):
+        return self.name_ru
