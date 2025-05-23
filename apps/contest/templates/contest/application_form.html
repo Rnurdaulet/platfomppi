@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% trans "Подача заявки" %}{% endblock %}
 {% block head %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.full.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"/>
+    {{ form.media }}
+
     <script src="{% static 'js/select2/ru.js' %}"></script>
     <script src="{% static 'js/select2/kk.js' %}"></script>
-
-
-    {{ form.media }}
 {% endblock %}
-
 {% block content %}
 
     <div class="bg-img-start" style="background-image: url({% static 'theme/images/card-11.svg' %});">
@@ -32,8 +31,8 @@
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 {{ form.non_field_errors }}
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Об участнике </h4></span>
 
-                <h4 class="text-center mt-4 mb-4"> Об участнике </h4>
                 <div class="mb-3">
                     <label for="{{ form.full_name.id_for_label }}" class="form-label ">
                         {{ form.full_name.label }}
@@ -68,9 +67,8 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="{{ form.position.id_for_label }}" class="form-label ">
                                 {{ form.position.label }}
@@ -80,6 +78,8 @@
                                 <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
                         </div>
+                    </div>
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="{{ form.subject.id_for_label }}" class="form-label">
                                 {{ form.subject.label }}
@@ -90,7 +90,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="mb-3">
                             <label for="{{ form.qualification.id_for_label }}" class="form-label ">
                                 {{ form.qualification.label }}
@@ -102,9 +102,8 @@
                         </div>
                     </div>
                 </div>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Регион </h4></span>
 
-
-                <h4 class="text-center mt-4 mb-4"> Регион </h4>
                 <div class="mb-3">
                     <label for="{{ form.region.id_for_label }}" class="form-label ">
                         {{ form.region.label }}
@@ -116,7 +115,6 @@
 
                 </div>
 
-
                 <div class="mb-3">
                     <label for="{{ form.school.id_for_label }}" class="form-label">
                         {{ form.school.label }}
@@ -127,7 +125,6 @@
                     {% endfor %}
                 </div>
 
-
                 <div class="mb-3">
                     <label for="{{ form.organization_address.id_for_label }}" class="form-label ">
                         {{ form.organization_address.label }}
@@ -137,8 +134,7 @@
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
                 </div>
-
-                <h4 class="text-center mt-4 mb-4"> Конкурс </h4>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Конкурс </h4></span>
                 <div class="mb-3">
                     <label for="{{ form.title.id_for_label }}" class="form-label ">
                         {{ form.title.label }}
@@ -173,7 +169,7 @@
                     {% endfor %}
                 </div>
 
-
+                <span class="divider-center mb-3">Файл заявки</span>
                 <div class="mb-3">
                     <label for="{{ form.file.id_for_label }}" class="form-label ">
                         {{ form.file.label }}
@@ -185,7 +181,7 @@
                 </div>
 
 
-                <div class="form-check mb-4">
+                <div class="form-check mt-3 mb-5">
                     {{ form.consent }}
                     <label for="{{ form.consent.id_for_label }}" class="form-check-label ">
                         {{ form.consent.label }}
@@ -194,7 +190,6 @@
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
                 </div>
-
                 <!-- Кнопка -->
                 <div class="d-grid">
                     {% if form.instance and form.instance.can_edit %}
@@ -253,6 +248,4 @@
             }
         });
     </script>
-
-
 {% endblock %}

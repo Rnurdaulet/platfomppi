@@ -10,25 +10,36 @@ from apps.lookups.models import Region, QualificationCategory, School, Position,
 
 class ApplicationForm(forms.ModelForm):
     full_name = forms.CharField(max_length=255, label="Ф.И.О.")
+
     position = forms.ModelChoiceField(
         queryset=Position.objects.all(),
         label="Должность",
-        widget=autocomplete.ModelSelect2(url="position-autocomplete")
+        widget=autocomplete.ModelSelect2(
+            url="position-autocomplete",
+            attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
+        )
     )
+
     subject = forms.ModelChoiceField(
         queryset=Subject.objects.all(),
         label="Предмет",
-        widget=autocomplete.ModelSelect2(url="subject-autocomplete"),
-        required=False
+        required=False,
+        widget=autocomplete.ModelSelect2(
+            url="subject-autocomplete",
+            attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
+        )
     )
+
     school = forms.ModelChoiceField(
         queryset=School.objects.none(),
         label="Организация образования",
         widget=autocomplete.ModelSelect2(
             url="school-autocomplete",
-            forward=["region"]
+            forward=["region"],
+            attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
         )
     )
+
     organization_address = forms.CharField(max_length=255, label="Адрес организации")
     phone = forms.CharField(max_length=32, label="Телефон")
     email = forms.EmailField(label="Электронная почта")
