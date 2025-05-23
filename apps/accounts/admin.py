@@ -48,17 +48,15 @@ class ParticipantProfileAdmin(ModelAdmin):
     list_filter = (
         "region",
         "qualification",
-        "position",
-        "subject",
-        "school",
         "consent",
     )
+    list_select_related = ("user", "qualification", "region", "position", "subject", "school")
+
     search_fields = (
         "full_name",
         "user__username",
         "email",
-        "phone",
-        "school__name_ru",
+        "phone"
     )
     autocomplete_fields = ("user", "qualification", "region", "position", "subject", "school")
 
