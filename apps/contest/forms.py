@@ -1,135 +1,103 @@
 from django import forms
-from apps.contest.models import Application
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from apps.contest.models import Application
+from apps.lookups.models import Region, QualificationCategory
+from apps.accounts.models import ParticipantProfile
 
 
 class ApplicationForm(forms.ModelForm):
-    """
-    Форма подачи заявки участником. Без CMS и без is_locked.
-    """
+    # поля из профиля участника
+    full_name = forms.CharField(max_length=255, label="Ф.И.О.")
+    position = forms.CharField(max_length=255, label="Должность")
+    qualification = forms.ModelChoiceField(queryset=QualificationCategory.objects.all(), label="Квалификационная категория")
+    organization_name = forms.CharField(max_length=255, label="Название организации")
+    organization_address = forms.CharField(max_length=255, label="Адрес организации")
+    phone = forms.CharField(max_length=32, label="Телефон")
+    email = forms.EmailField(label="Электронная почта")
+    region = forms.ModelChoiceField(queryset=Region.objects.all(), label="Регион")
+    consent = forms.BooleanField(label="Согласие на обработку персональных данных", required=True)
 
     class Meta:
         model = Application
         exclude = ["uid", "participant", "cms", "is_locked", "submitted_at", "updated_at"]
-        widgets = {
-            "consent": forms.CheckboxInput(attrs={"class": "checkbox"}),
-            "phone": forms.TextInput(attrs={   "class": "form-control form-control-lg",
-    "type": "tel",
-    "placeholder": "+7 (7XX) XXX-XX-XX",
-    "id": "phone"}),
-            "email": forms.EmailInput(),
-        }
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user", None)  # передаём user из views
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-        # Ф.И.О. участника
-        self.fields["full_name"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "Иванов Иван"
-        })
+        # Предзаполнение из профиля
+        if self.user:
+            profile = getattr(self.user, "participant_profile", None)
+            if profile:
+                self.initial.update({
+                    "full_name": profile.full_name,
+                    "position": profile.position,
+                    "qualification": profile.qualification,
+                    "organization_name": profile.organization_name,
+                    "organization_address": profile.organization_address,
+                    "phone": profile.phone,
+                    "email": profile.email,
+                    "region": profile.region,
+                    "consent": profile.consent,
+                })
+            elif not self.instance.pk:
+                self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name}"
 
-        # Электронная почта
-        self.fields["email"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "email@example.com"
-        })
+        # Добавление CSS-классов и отображение ошибок
+        for name, field in self.fields.items():
+            base_class = "form-control"
+            if isinstance(field.widget, forms.CheckboxInput):
+                base_class = "form-check-input"
+            elif isinstance(field.widget, forms.Select):
+                base_class = "form-select"
 
-        # Телефон
-        self.fields["phone"].widget.attrs.update({
-            "class": "form-control ",
-            "type": "tel",
-            "placeholder": "+7 (7XX) XXX-XX-XX"
-        })
+            if self.errors.get(name):
+                base_class += " is-invalid"
+            elif self.is_bound:
+                base_class += " is-valid"
 
-        # Должность
-        self.fields["position"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "Учитель информатики"
-        })
+            field.widget.attrs.setdefault("class", base_class)
 
-        # Квалификационная категория
-        self.fields["qualification"].widget.attrs.update({
-            "class": "form-select "
-        })
-
-        # Филиал
-        self.fields["branch"].widget.attrs.update({
-            "class": "form-select "
-        })
-
-        # Название организации
-        self.fields["organization_name"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "КГУ 'Школа №5'"
-        })
-
-        # Адрес организации
-        self.fields["organization_address"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "г. Алматы, ул. Абая, 25"
-        })
-
-        # Название конкурсного материала
-        self.fields["title"].widget.attrs.update({
-            "class": "form-control ",
-            "placeholder": "Разработка урока по математике"
-        })
-
-        # Направление конкурса
-        self.fields["direction"].widget.attrs.update({
-            "class": "form-select "
-        })
-
-        # Файл заявки
-        self.fields["file"].widget.attrs.update({
-            "class": "form-control "
-        })
-
-        # Согласие
-        self.fields["consent"].widget.attrs.update({
-            "class": "form-check-input"
-        })
-        self.fields["consent"].required = True
         self.fields["consent"].error_messages = {
             "required": "Необходимо дать согласие на обработку персональных данных."
         }
 
-        for name, field in self.fields.items():
-            css_class = "form-control "
-            if isinstance(field.widget, forms.CheckboxInput):
-                css_class = "form-check-input"
-            elif isinstance(field.widget, forms.Select):
-                css_class = "form-select "
-
-            if self.errors.get(name):
-                css_class += " is-invalid"
-            elif self.is_bound:
-                css_class += " is-valid"
-
-            field.widget.attrs["class"] = css_class.strip()
-
-        # Автозаполнение ФИО
-        if self.user and not self.instance.pk:
-            self.fields["full_name"].initial = f"{self.user.last_name} {self.user.first_name}"
-
-        # Блокировка формы при is_locked
+        # Блокировка при is_locked
         if self.instance and self.instance.is_locked:
             for field in self.fields.values():
                 field.disabled = True
 
-    def clean_participant(self):
-        # Просто на случай, если кто-то вручную подставит participant
-        participant = self.cleaned_data.get("participant")
-        if participant and participant.role != "participant":
-            raise ValidationError("Только участник может подать заявку.")
-        return participant
-
     def clean(self):
         cleaned_data = super().clean()
-
         if self.instance and self.instance.is_locked:
             raise ValidationError("Заявка уже подписана и не может быть изменена.")
-
         return cleaned_data
+
+    def save(self, commit=True):
+        with transaction.atomic():
+            application = super().save(commit=False)
+            application.participant = self.user
+
+            # Профиль участника
+            profile, _ = ParticipantProfile.objects.get_or_create(user=self.user)
+            profile.full_name = self.cleaned_data["full_name"]
+            profile.position = self.cleaned_data["position"]
+            profile.qualification = self.cleaned_data["qualification"]
+            profile.organization_name = self.cleaned_data["organization_name"]
+            profile.organization_address = self.cleaned_data["organization_address"]
+            profile.phone = self.cleaned_data["phone"]
+            profile.email = self.cleaned_data["email"]
+            profile.region = self.cleaned_data["region"]
+            profile.consent = self.cleaned_data["consent"]
+            profile.save()
+
+            # Обновим email в user, если нужно
+            if self.user.email != self.cleaned_data["email"]:
+                self.user.email = self.cleaned_data["email"]
+                self.user.save(update_fields=["email"])
+
+            if commit:
+                application.save()
+
+            return application

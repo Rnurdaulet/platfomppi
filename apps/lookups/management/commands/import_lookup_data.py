@@ -1,9 +1,16 @@
 import csv
 import os
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
-from apps.lookups.models import Branch, CompetitionDirection, QualificationCategory, EvaluationCriterion
+
+from apps.lookups.models import (
+    Branch,
+    CompetitionDirection,
+    QualificationCategory,
+    EvaluationCriterion,
+    Region,
+)
 
 
 class Command(BaseCommand):
@@ -12,12 +19,29 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         base_dir = os.path.join(settings.BASE_DIR, "apps", "lookups", "data")
 
+        self.import_regions(os.path.join(base_dir, "regions.csv"))
         self.import_branches(os.path.join(base_dir, "branches.csv"))
         self.import_directions(os.path.join(base_dir, "directions.csv"))
         self.import_categories(os.path.join(base_dir, "categories.csv"))
         self.import_criteria(os.path.join(base_dir, "criteria.csv"))
 
-        self.stdout.write(self.style.SUCCESS("Импорт завершён успешно."))
+        self.stdout.write(self.style.SUCCESS("✅ Импорт завершён успешно."))
+
+    def import_regions(self, filepath):
+        if not os.path.exists(filepath):
+            self.stdout.write(f"Пропущено: {filepath} не найден")
+            return
+
+        Region.objects.all().delete()
+        with open(filepath, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                Region.objects.create(
+                    name_ru=row["name_ru"],
+                    name_kk=row["name_kk"],
+                    code=row["code"]
+                )
+        self.stdout.write(self.style.SUCCESS("✅ Регионы загружены."))
 
     def import_branches(self, filepath):
         if not os.path.exists(filepath):
@@ -28,11 +52,20 @@ class Command(BaseCommand):
         with open(filepath, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
+                region = None
+                region_code = row.get("region_code")
+                if region_code:
+                    try:
+                        region = Region.objects.get(code=region_code)
+                    except Region.DoesNotExist:
+                        self.stdout.write(self.style.WARNING(f"⚠️ Регион с кодом '{region_code}' не найден."))
+
                 Branch.objects.create(
                     name_ru=row["name_ru"],
                     name_kk=row["name_kk"],
                     bin=row["bin"],
-                    external_id=row["external_id"]
+                    external_id=row["external_id"],
+                    region=region
                 )
         self.stdout.write(self.style.SUCCESS("✅ Филиалы загружены."))
 

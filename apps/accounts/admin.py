@@ -26,3 +26,47 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             "fields": ("username", "password1", "password2", "role", "is_staff", "is_superuser", "groups"),
         }),
     )
+
+
+from apps.accounts.models import ParticipantProfile
+
+
+@admin.register(ParticipantProfile)
+class ParticipantProfileAdmin(ModelAdmin):
+    list_display = (
+        "full_name",
+        "user",
+        "email",
+        "phone",
+        "region",
+        "qualification",
+        "consent",
+    )
+    list_filter = (
+        "region",
+        "qualification",
+        "consent",
+    )
+    search_fields = (
+        "full_name",
+        "user__username",
+        "email",
+        "phone",
+        "organization_name",
+    )
+    autocomplete_fields = ("user", "qualification", "region")
+
+    fieldsets = (
+        ("Пользователь", {
+            "fields": ("user", "full_name", "position", "email", "phone", "consent")
+        }),
+        ("Организация", {
+            "fields": ("organization_name", "organization_address")
+        }),
+        ("Регион и квалификация", {
+            "fields": ("region", "qualification")
+        }),
+    )
+
+    readonly_fields = ("user",)
+    ordering = ("full_name",)

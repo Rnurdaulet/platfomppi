@@ -5,110 +5,76 @@
 {% block title %}{% trans "Главная" %}{% endblock %}
 
 {% block content %}
-    <!-- Hero -->
-    <div class="overflow-hidden">
-        <div class="container content-space-t-4 content-space-b-3">
-            {% include "includes/alerts.html" %}
-            <div class="row justify-content-lg-between align-items-md-center">
-                <div class="col-md-6 col-lg-5 mb-7 mb-md-0">
-                    <!-- Heading -->
-                    <div class="mb-5">
-                        <span class="text-cap">Өрлеу 2025</span>
-                        <h1 class="display-4 mb-3">{% trans "Панорама педагогических идей" %}</h1>
-                        <p class="lead">Площадка для обмена эффективными педагогическими практиками в сфере
-                            функциональной грамотности.</p>
+<div class="overflow-hidden">
+    <div class="container content-space-t-4 content-space-b-3">
+        {% include "includes/alerts.html" %}
+        <div class="row justify-content-lg-between align-items-md-center">
+            <div class="col-md-6 col-lg-5 mb-7 mb-md-0">
+                <div class="mb-5">
+                    <span class="text-cap">Өрлеу 2025</span>
+                    <h1 class="display-4 mb-3">{% trans "Панорама педагогических идей" %}</h1>
+                    <p class="lead">{% trans "Площадка для обмена эффективными педагогическими практиками в сфере функциональной грамотности." %}</p>
+                </div>
+
+                {% if not request.user.is_authenticated %}
+                    <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded">
+                        {% trans "Для подачи заявки необходимо войти через ЭЦП." %}
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'ecp_login' %}" class="btn btn-primary btn-transition">
+                            {% trans "Войти через ЭЦП" %}
+                        </a>
                     </div>
 
-                    {% if not request.user.is_authenticated %}
-                        <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded">
-                            {% trans "Для подачи заявки необходимо войти через ЭЦП." %}
-                        </div>
-                        <div class="mt-4">
-                            <a href="{% url 'ecp_login' %}"
-                               class="btn btn-primary btn-transition">
-                                {% trans "Войти через ЭЦП" %}
-                            </a>
-                        </div>
-                    {% elif request.user.role == "participant" %}
-                        {% if request.user.application %}
-                            <!-- Heading -->
+                {% elif request.user.role == "participant" %}
+                    {% with application=request.user.applications.first profile=request.user.profile %}
+                        {% if application %}
                             <div class="w-lg-75 text-center mx-auto mb-sm-9">
                                 <h2 class="h1">{% trans "Ваша заявка" %}</h2>
                             </div>
-                            <!-- List Striped -->
+
                             <ul class="list-group list-group-lg">
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-sm-4 mb-4 mb-sm-0">
-                                            <span class="h6">{% trans "Ф.И.О." %}:</span>
-                                        </div>
-                                        <!-- End Col -->
-                                        <div class="col-sm-8 mb-4 mb-sm-0">
-                                            <span> {{ request.user.application.full_name }}</span>
-                                        </div>
-                                        <!-- End Col -->
+                                        <div class="col-sm-4"><span class="h6">{% trans "Ф.И.О." %}:</span></div>
+                                        <div class="col-sm-8">{{ profile.full_name }}</div>
                                     </div>
-                                    <!-- End Row -->
                                 </li>
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-sm-4 mb-4 mb-sm-0">
-                                            <span class="h6">{% trans "Филиал" %}:</span>
-                                        </div>
-                                        <!-- End Col -->
-                                        <div class="col-sm-6 mb-4 mb-sm-0">
-                                            <span> {{ request.user.application.branch.name }}</span>
-                                        </div>
-                                        <!-- End Col -->
+                                        <div class="col-sm-4"><span class="h6">{% trans "Регион" %}:</span></div>
+                                        <div class="col-sm-8">{{ profile.region.name }}</div>
                                     </div>
-                                    <!-- End Row -->
                                 </li>
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-sm-4 mb-4 mb-sm-0">
-                                            <span class="h6">{% trans "Направление" %}:</span>
-                                        </div>
-                                        <!-- End Col -->
-                                        <div class="col-sm-6 mb-4 mb-sm-0">
-                                            <span> {{ request.user.application.direction.name }}</span>
-                                        </div>
-                                        <!-- End Col -->
+                                        <div class="col-sm-4"><span class="h6">{% trans "Направление" %}:</span></div>
+                                        <div class="col-sm-8">{{ application.direction.name }}</div>
                                     </div>
-                                    <!-- End Row -->
                                 </li>
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-sm-4 mb-4 mb-sm-0">
-                                            <span class="h6">{% trans "Статус" %}:</span>
+                                        <div class="col-sm-4"><span class="h6">{% trans "Статус" %}:</span></div>
+                                        <div class="col-sm-8">
+                                            {% if application.is_locked %}
+                                                {% trans "Отправлена" %}
+                                            {% else %}
+                                                {% trans "Черновик (не подписана)" %}
+                                            {% endif %}
                                         </div>
-                                        <!-- End Col -->
-                                        <div class="col-sm-6 mb-4 mb-sm-0">
-                                            <span>
-                                                  {% trans "Отправлена" %}
-{#                                                {% if request.user.application.is_locked %}#}
-{#                                                {% trans "Отправлена" %}#}
-{#                                            {% else %}#}
-{#                                                {% trans "Черновик (не подписана)" %}#}
-{#                                            {% endif %}</span>#}
-                                        </div>
-                                        <!-- End Col -->
                                     </div>
-                                    <!-- End Row -->
                                 </li>
                                 <li class="list-group-item d-flex justify-content-end">
-                                    <a href="{% url 'contest:application_preview' %}"
-                                       class="btn btn-outline-primary">
+                                    <a href="{% url 'contest:application_preview' %}" class="btn btn-outline-primary">
                                         {% trans "Перейти к заявке" %}
                                     </a>
                                 </li>
                             </ul>
-                            <!-- End List Striped -->
                         {% else %}
                             {% if can_create %}
                                 <div class="bg-blue-50 border border-blue-200 p-4 rounded">
                                     <p class="mb-2">{% trans "Вы ещё не подали заявку." %}</p>
-                                    <a href="{% url 'contest:application_create' %}"
-                                       class="btn btn-primary btn-transition">
+                                    <a href="{% url 'contest:application_create' %}" class="btn btn-primary btn-transition">
                                         {% trans "Подать заявку" %}
                                     </a>
                                 </div>
@@ -119,26 +85,23 @@
                                 </div>
                             {% endif %}
                         {% endif %}
+                    {% endwith %}
 
-                    {% else %}
-                        <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
-                            {% trans "Вы вошли как эксперт или администратор. Подача заявок доступна только участникам." %}
-                        </div>
-                    {% endif %}
-                    <!-- End Title & Description -->
-                </div>
-                <!-- End Col -->
-                <div class="col-md-6">
-                    <div class="position-relative">
-                        <img class="img-fluid rounded-2" width="650" height="650"
-                             src="{% static 'theme/images/yy.png' %}" alt="Image Description">
-                        <div class="position-absolute top-0 end-0 w-100 h-100 bg-soft-primary rounded-2 zi-n1 mt-5 me-n5"></div>
+                {% else %}
+                    <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
+                        {% trans "Вы вошли как эксперт или администратор. Подача заявок доступна только участникам." %}
                     </div>
-                </div>
-                <!-- End Col -->
+                {% endif %}
             </div>
-            <!-- End Row -->
+
+            <div class="col-md-6">
+                <div class="position-relative">
+                    <img class="img-fluid rounded-2" width="650" height="650"
+                         src="{% static 'theme/images/yy.png' %}" alt="Image Description">
+                    <div class="position-absolute top-0 end-0 w-100 h-100 bg-soft-primary rounded-2 zi-n1 mt-5 me-n5"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- End Hero -->
+</div>
 {% endblock %}

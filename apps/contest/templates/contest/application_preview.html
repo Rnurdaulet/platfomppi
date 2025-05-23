@@ -8,46 +8,46 @@
 {% endblock %}
 
 {% block content %}
+<div class="container content-space-t-3 content-space-lg-4 content-space-b-2">
+    {% include "includes/alerts.html" %}
+    <div class="row">
+        <div class="col-lg-6 mb-7 mb-lg-0">
+            <img class="img-fluid rounded-3" src="{% static 'theme/images/done.png' %}" alt="Preview">
+        </div>
+        <div class="col-lg-6">
+            <div class="ps-lg-4">
+                <div class="mb-5">
+                    <h1 class="h2 mb-3">{% trans "Проверка заявки перед подачей" %}</h1>
+                    <p class="text-muted">
+                        {% trans "Проверьте все данные перед отправкой. После подписания заявку изменить будет невозможно." %}
+                    </p>
+                </div>
 
-    <div class="container content-space-t-3 content-space-lg-4 content-space-b-2">
-        {% include "includes/alerts.html" %}
-        <div class="row">
-            <div class="col-lg-6 mb-7 mb-lg-0">
-                <img class="img-fluid rounded-3" src="{% static 'theme/images/done.png' %}" alt="Preview">
-            </div>
-            <div class="col-lg-6">
-                <div class="ps-lg-4">
-                    <div class="mb-5">
-                        <h1 class="h2 mb-3">{% trans "Проверка заявки перед подачей" %}</h1>
-                        <p class="text-muted">
-                            {% trans "Проверьте все данные перед отправкой. После подписания заявку изменить будет невозможно." %}
-                        </p>
-                    </div>
-
+                {% with profile=request.user.profile %}
                     <dl class="row">
                         <dt class="col-sm-5">{% trans "Ф.И.О. участника" %}</dt>
-                        <dd class="col-sm-7">{{ application.full_name }}</dd>
+                        <dd class="col-sm-7">{{ profile.full_name }}</dd>
 
-                        <dt class="col-sm-5">{% trans "Филиал" %}</dt>
-                        <dd class="col-sm-7">{{ application.branch.name }}</dd>
+                        <dt class="col-sm-5">{% trans "Регион" %}</dt>
+                        <dd class="col-sm-7">{{ profile.region.name }}</dd>
 
                         <dt class="col-sm-5">{% trans "Квалификационная категория" %}</dt>
-                        <dd class="col-sm-7">{{ application.qualification.name }}</dd>
+                        <dd class="col-sm-7">{{ profile.qualification.name }}</dd>
 
                         <dt class="col-sm-5">{% trans "Должность" %}</dt>
-                        <dd class="col-sm-7">{{ application.position }}</dd>
+                        <dd class="col-sm-7">{{ profile.position }}</dd>
 
                         <dt class="col-sm-5">{% trans "Организация" %}</dt>
-                        <dd class="col-sm-7">{{ application.organization_name }}</dd>
+                        <dd class="col-sm-7">{{ profile.organization_name }}</dd>
 
                         <dt class="col-sm-5">{% trans "Адрес организации" %}</dt>
-                        <dd class="col-sm-7">{{ application.organization_address }}</dd>
+                        <dd class="col-sm-7">{{ profile.organization_address }}</dd>
 
                         <dt class="col-sm-5">{% trans "Электронная почта" %}</dt>
-                        <dd class="col-sm-7">{{ application.email }}</dd>
+                        <dd class="col-sm-7">{{ profile.email }}</dd>
 
                         <dt class="col-sm-5">{% trans "Телефон" %}</dt>
-                        <dd class="col-sm-7">{{ application.phone }}</dd>
+                        <dd class="col-sm-7">{{ profile.phone }}</dd>
 
                         <dt class="col-sm-5">{% trans "Название конкурсного материала" %}</dt>
                         <dd class="col-sm-7">{{ application.title }}</dd>
@@ -62,40 +62,39 @@
                             </a>
                         </dd>
                     </dl>
+                {% endwith %}
 
-                    {% if not application.is_locked %}
-                        <div class="d-flex gap-2 mt-4">
-                            {% if  application.can_edit %}
-                                <a href="{% url 'contest:application_edit' %}" class="btn btn-outline-secondary">
-                                    {% trans "Изменить" %}
-                                </a>
-                            {% endif %}
-                            {#                            <button id="signButton" class="btn btn-primary">#}
-                            {#                                {% trans "Подписать и отправить" %}#}
-                            {#                            </button>#}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-success mt-4" role="alert">
-                            <i class="bi bi-check-circle-fill me-1"></i>
-                            {% trans "Заявка и отправлена." %}
-                        </div>
-                    {% endif %}
+                {% if not application.is_locked %}
+                    <div class="d-flex gap-2 mt-4">
+                        {% if application.can_edit %}
+                            <a href="{% url 'contest:application_edit' %}" class="btn btn-outline-secondary">
+                                {% trans "Изменить" %}
+                            </a>
+                        {% endif %}
+                        <!-- Подпись будет автоматически подключена через JS -->
+                    </div>
+                {% else %}
+                    <div class="alert alert-success mt-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        {% trans "Заявка отправлена." %}
+                    </div>
+                {% endif %}
 
-                    <div id="status" class="form-text mt-3 text-muted"></div>
-                </div>
+                <div id="status" class="form-text mt-3 text-muted"></div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
     {% if not application.is_locked %}
         <script id="sign-config" type="application/json">
             {
-              "endpoint": "{% url 'contest:application_sign' %}",
-        "csrf": "{{ csrf_token }}",
-        "uid": "{{ application.uid }}"
-      }
+                "endpoint": "{% url 'contest:application_sign' %}",
+                "csrf": "{{ csrf_token }}",
+                "uid": "{{ application.uid }}"
+            }
         </script>
         <script src="{% static 'js/ncalayer-client.js' %}"></script>
         <script src="{% static 'js/sign_application.js' %}"></script>

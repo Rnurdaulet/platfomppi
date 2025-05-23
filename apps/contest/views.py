@@ -3,10 +3,8 @@ import json
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login, get_user_model
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from django.views import View
@@ -21,21 +19,24 @@ class ParticipantRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-
         if request.user.role != "participant":
             return render(request, "403_participant_only.html", status=403)
-
         return super().dispatch(request, *args, **kwargs)
 
 
-class ApplicationCreateView(ParticipantRequiredMixin, View):
+class ApplicationBaseView(ParticipantRequiredMixin, View):
+    """Базовый класс для работы с заявкой"""
+    def get_user_application(self, request):
+        return Application.objects.filter(participant=request.user).first()
+
+
+class ApplicationCreateView(ApplicationBaseView):
     """Создание новой заявки"""
     def get(self, request):
-        if hasattr(request.user, "application"):
+        if self.get_user_application(request):
             return redirect("contest:application_edit")
 
-        can_create = date.today() < getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max)
-        if not can_create:
+        if date.today() >= getattr(settings, "APPLICATION_EDIT_DEADLINE", date.max):
             messages.error(request, _("Приём заявок завершён."))
             return redirect("home")
 
@@ -43,23 +44,22 @@ class ApplicationCreateView(ParticipantRequiredMixin, View):
         return render(request, "contest/application_form.html", {"form": form})
 
     def post(self, request):
-        if hasattr(request.user, "application"):
+        if self.get_user_application(request):
             return redirect("contest:application_edit")
 
         form = ApplicationForm(request.POST, request.FILES, user=request.user)
-        if form.is_valid():
-            app = form.save(commit=False)
-            app.participant = request.user
-            app.save()
-            messages.success(request, _("Заявка создана."))
-            return redirect("contest:application_preview")
-        return render(request, "contest/application_form.html", {"form": form})
+        if not form.is_valid():
+            return render(request, "contest/application_form.html", {"form": form})
+
+        form.save()
+        messages.success(request, _("Заявка создана."))
+        return redirect("contest:application_preview")
 
 
-class ApplicationUpdateView(ParticipantRequiredMixin, View):
+class ApplicationUpdateView(ApplicationBaseView):
     """Редактирование черновика"""
     def get(self, request):
-        app = getattr(request.user, "application", None)
+        app = self.get_user_application(request)
         if not app or not app.can_edit():
             messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
@@ -68,35 +68,39 @@ class ApplicationUpdateView(ParticipantRequiredMixin, View):
         return render(request, "contest/application_form.html", {"form": form})
 
     def post(self, request):
-        app = getattr(request.user, "application", None)
+        app = self.get_user_application(request)
         if not app or not app.can_edit():
             messages.warning(request, _("Редактирование заявки недоступно."))
             return redirect("contest:application_preview")
 
         form = ApplicationForm(request.POST, request.FILES, instance=app, user=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, _("Изменения сохранены."))
-            return redirect("contest:application_preview")
-        return render(request, "contest/application_form.html", {"form": form})
+        if not form.is_valid():
+            return render(request, "contest/application_form.html", {"form": form})
+
+        form.save()
+        messages.success(request, _("Изменения сохранены."))
+        return redirect("contest:application_preview")
 
 
-class ApplicationPreviewView(ParticipantRequiredMixin, View):
+class ApplicationPreviewView(ApplicationBaseView):
     """Просмотр заявки перед подписью"""
     def get(self, request):
-        app = getattr(request.user, "application", None)
+        app = self.get_user_application(request)
         if not app:
             messages.warning(request, _("Вы ещё не подали заявку."))
             return redirect("contest:application_create")
         return render(request, "contest/application_preview.html", {"application": app})
 
 
-class ApplicationSignView(ParticipantRequiredMixin, View):
+class ApplicationSignView(ApplicationBaseView):
     """Подписание заявки — POST с CMS-подписью"""
     def post(self, request):
-        app = getattr(request.user, "application", None)
+        app = self.get_user_application(request)
         if not app:
             return JsonResponse({"success": False, "message": _("Заявка не найдена.")}, status=404)
+
+        if app.is_locked:
+            return JsonResponse({"success": False, "message": _("Заявка уже подписана.")}, status=400)
 
         try:
             data = json.loads(request.body)
@@ -106,11 +110,13 @@ class ApplicationSignView(ParticipantRequiredMixin, View):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=400)
 
-        if app.is_locked:
-            return JsonResponse({"success": False, "message": _("Заявка уже подписана.")}, status=400)
-
         if request.user.username != iin:
             return JsonResponse({"success": False, "message": _("Подпись не соответствует вашему ИИН.")}, status=400)
+
+        profile = request.user.profile
+        if profile and not profile.full_name:
+            profile.full_name = full_name
+            profile.save()
 
         app.cms = cms
         app.is_locked = True

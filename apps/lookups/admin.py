@@ -1,20 +1,25 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import Branch, CompetitionDirection, QualificationCategory, EvaluationCriterion, ExpertRegistry
+from .models import Branch, CompetitionDirection, QualificationCategory, EvaluationCriterion, ExpertRegistry, Region
 
+
+@admin.register(Region)
+class RegionAdmin(ModelAdmin):
+    list_display = ("name_ru", "code")
+    search_fields = ("name_ru", "name_kk", "code")
 
 @admin.register(Branch)
 class BranchAdmin(ModelAdmin):
-    list_display = ("name_ru", "name_kk", "bin", "external_id", "created_at")
-    search_fields = ("name_ru", "name_kk", "bin", "external_id")
-    list_filter = ("created_at",)
+    list_display = ("name_ru", "name_kk", "bin", "external_id", "region", "created_at")  # <- добавлено
+    search_fields = ("name_ru", "name_kk", "bin", "external_id", "region__name_ru")      # <- по имени региона
+    list_filter = ("region", "created_at")                                               # <- фильтр по региону
     ordering = ("name_ru",)
     readonly_fields = ("created_at", "updated_at")
 
     fieldsets = (
         (None, {
-            "fields": ("name_ru", "name_kk", "bin", "external_id")
+            "fields": ("name_ru", "name_kk", "bin", "external_id", "region")             # <- добавлено
         }),
         ("Служебная информация", {
             "fields": ("created_at", "updated_at"),

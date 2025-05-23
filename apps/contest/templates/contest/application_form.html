@@ -85,15 +85,16 @@
                 </div>
 
 
-                <h4 class="text-center mt-4 mb-4"> Организация образования </h4>
+                <h4 class="text-center mt-4 mb-4"> Регион </h4>
                 <div class="mb-3">
-                    <label for="{{ form.branch.id_for_label }}" class="form-label ">
-                        {{ form.branch.label }}
+                    <label for="{{ form.region.id_for_label }}" class="form-label ">
+                        {{ form.region.label }}
                     </label>
-                    {{ form.branch }}
-                    {% for error in form.branch.errors %}
+                    {{ form.region }}
+                    {% for error in form.region.errors %}
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
+
                 </div>
 
 
@@ -140,6 +141,19 @@
                     {% endfor %}
                 </div>
 
+                <div class="mb-3">
+                    <label for="{{ form.keywords.id_for_label }}" class="form-label">
+                        {{ form.keywords.label }}
+                    </label>
+                    {{ form.keywords }}
+                    {% if form.keywords.help_text %}
+                        <div class="form-text">{{ form.keywords.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.keywords.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
 
                 <div class="mb-3">
                     <label for="{{ form.file.id_for_label }}" class="form-label ">
@@ -177,49 +191,49 @@
             </form>
         </div>
     </div>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const phoneInput = document.getElementById("phone");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInput = document.getElementById("phone");
 
-  phoneInput.addEventListener("input", formatPhone);
-  phoneInput.addEventListener("blur", clearIncomplete);
+            phoneInput.addEventListener("input", formatPhone);
+            phoneInput.addEventListener("blur", clearIncomplete);
 
-  function formatPhone(e) {
-    let input = e.target;
-    let digits = input.value.replace(/\D/g, "").substring(0, 11);
+            function formatPhone(e) {
+                let input = e.target;
+                let digits = input.value.replace(/\D/g, "").substring(0, 11);
 
-    let formatted = "";
+                let formatted = "";
 
-    if (digits.length === 0) {
-      formatted = "";
-    } else {
-      formatted = "+7";
+                if (digits.length === 0) {
+                    formatted = "";
+                } else {
+                    formatted = "+7";
 
-      if (digits.length >= 2) {
-        formatted += " (" + digits.substring(1, 4);
-      }
-      if (digits.length >= 5) {
-        formatted += ") " + digits.substring(4, 7);
-      }
-      if (digits.length >= 8) {
-        formatted += "-" + digits.substring(7, 9);
-      }
-      if (digits.length >= 10) {
-        formatted += "-" + digits.substring(9, 11);
-      }
-    }
+                    if (digits.length >= 2) {
+                        formatted += " (" + digits.substring(1, 4);
+                    }
+                    if (digits.length >= 5) {
+                        formatted += ") " + digits.substring(4, 7);
+                    }
+                    if (digits.length >= 8) {
+                        formatted += "-" + digits.substring(7, 9);
+                    }
+                    if (digits.length >= 10) {
+                        formatted += "-" + digits.substring(9, 11);
+                    }
+                }
 
-    input.value = formatted;
-  }
+                input.value = formatted;
+            }
 
-  function clearIncomplete(e) {
-    const digits = e.target.value.replace(/\D/g, "");
-    if (digits.length < 11) {
-      e.target.value = "";
-    }
-  }
-});
-</script>
+            function clearIncomplete(e) {
+                const digits = e.target.value.replace(/\D/g, "");
+                if (digits.length < 11) {
+                    e.target.value = "";
+                }
+            }
+        });
+    </script>
 
 
 {% endblock %}

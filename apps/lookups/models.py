@@ -2,6 +2,25 @@ from django.db import models
 from .mixins import TranslatableNameMixin
 
 
+class Region(TranslatableNameMixin, models.Model):
+    """
+    Справочник регионов.
+    """
+
+    name_ru = models.CharField(max_length=255, verbose_name="Название региона (рус)")
+    name_kk = models.CharField(max_length=255, verbose_name="Атауы (қаз)")
+    code = models.CharField(max_length=10, unique=True, verbose_name="Код региона")
+
+    class Meta:
+        db_table = "lookups_region"
+        verbose_name = "Регион"
+        verbose_name_plural = "Регионы"
+        ordering = ["name_ru"]
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Branch(TranslatableNameMixin, models.Model):
     """
     Справочник филиалов.
@@ -21,6 +40,15 @@ class Branch(TranslatableNameMixin, models.Model):
         verbose_name="Внешний ID",
         help_text="ID из внешней системы (например, ЕБДП)"
     )
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+        related_name="branches",
+        verbose_name="Регион",
+        null=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлён")
 

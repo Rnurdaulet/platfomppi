@@ -2,6 +2,8 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from apps.lookups.models import Branch, QualificationCategory, Region
+
 
 class User(AbstractUser):
     """
@@ -33,5 +35,50 @@ class User(AbstractUser):
         """Генерация безопасного nonce"""
         return secrets.token_urlsafe(length)
 
+    @property
+    def profile(self):
+        if self.role == "participant":
+            return getattr(self, "participant_profile", None)
+        return None
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
+
+
+
+class ParticipantProfile(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="participant_profile",
+        limit_choices_to={"role": "participant"},
+        verbose_name="Пользователь"
+    )
+
+    full_name = models.CharField(max_length=255, verbose_name="Ф.И.О. (из ЭЦП)")
+    position = models.CharField(max_length=255, verbose_name="Должность")
+    qualification = models.ForeignKey(
+        QualificationCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Квалификационная категория"
+    )
+    organization_name = models.CharField(max_length=255, verbose_name="Название организации образования")
+    organization_address = models.CharField(max_length=255, verbose_name="Адрес организации образования")
+    phone = models.CharField(max_length=32, verbose_name="Контактный телефон")
+    email = models.EmailField(verbose_name="Электронная почта")
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Регион"
+    )
+    consent = models.BooleanField(default=False, verbose_name="Согласие на обработку персональных данных")
+
+    class Meta:
+        db_table = "participant_profile"
+        verbose_name = "Профиль участника"
+        verbose_name_plural = "Профили участников"
+
+    def __str__(self):
+        return f"{self.full_name} — {self.user.username}"
