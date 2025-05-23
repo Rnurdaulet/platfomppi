@@ -27,7 +27,8 @@
                     </div>
 
                 {% elif request.user.role == "participant" %}
-                    {% with application=request.user.applications.first profile=request.user.profile %}
+                    {% with application=request.user.applications profile=request.user.profile %}
+
                         {% if application %}
                             <div class="w-lg-75 text-center mx-auto mb-sm-9">
                                 <h2 class="h1">{% trans "Ваша заявка" %}</h2>
@@ -56,11 +57,12 @@
                                     <div class="row">
                                         <div class="col-sm-4"><span class="h6">{% trans "Статус" %}:</span></div>
                                         <div class="col-sm-8">
-                                            {% if application.is_locked %}
-                                                {% trans "Отправлена" %}
-                                            {% else %}
-                                                {% trans "Черновик (не подписана)" %}
-                                            {% endif %}
+                                          {% trans "Отправлена" %}
+{#                                            {% if application.is_locked %}#}
+{#                                                {% trans "Отправлена" %}#}
+{#                                            {% else %}#}
+{#                                                {% trans "Черновик (не подписана)" %}#}
+{#                                            {% endif %}#}
                                         </div>
                                     </div>
                                 </li>

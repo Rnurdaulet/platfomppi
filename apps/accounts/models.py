@@ -2,6 +2,7 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from apps.lookups.models import Branch, QualificationCategory, Region, Position, Subject, School
 
 
@@ -40,11 +41,6 @@ class User(AbstractUser):
         if self.role == "participant":
             return getattr(self, "participant_profile", None)
         return None
-
-    @property
-    def current_application(self):
-        return self.applications.first()
-
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
