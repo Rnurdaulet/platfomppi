@@ -27,6 +27,9 @@ INSTALLED_APPS = [
 
     "corsheaders",
     "whitenoise",
+    "dal",
+    "dal_select2",
+    "django_select2",
 
     "apps.accounts",
     "apps.lookups",

@@ -290,7 +290,7 @@ class School(models.Model):
     school_type = models.ForeignKey(SchoolType, on_delete=models.SET_NULL, null=True, verbose_name="Тип организации")
     school_form = models.ForeignKey(SchoolForm, on_delete=models.SET_NULL, null=True, verbose_name="Форма организации")
 
-    external_id = models.PositiveIntegerField(unique=True, verbose_name="Внешний ID")
+    external_id = models.CharField(max_length=32, unique=True)
 
     class Meta:
         db_table = "lookup_school"

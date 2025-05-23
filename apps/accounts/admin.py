@@ -40,11 +40,17 @@ class ParticipantProfileAdmin(ModelAdmin):
         "phone",
         "region",
         "qualification",
+        "position",
+        "subject",
+        "school",
         "consent",
     )
     list_filter = (
         "region",
         "qualification",
+        "position",
+        "subject",
+        "school",
         "consent",
     )
     search_fields = (
@@ -52,19 +58,19 @@ class ParticipantProfileAdmin(ModelAdmin):
         "user__username",
         "email",
         "phone",
-        "organization_name",
+        "school__name_ru",
     )
-    autocomplete_fields = ("user", "qualification", "region")
+    autocomplete_fields = ("user", "qualification", "region", "position", "subject", "school")
 
     fieldsets = (
         ("Пользователь", {
-            "fields": ("user", "full_name", "position", "email", "phone", "consent")
+            "fields": ("user", "full_name", "email", "phone", "consent")
         }),
         ("Организация", {
-            "fields": ("organization_name", "organization_address")
+            "fields": ("school", "organization_address")
         }),
         ("Регион и квалификация", {
-            "fields": ("region", "qualification")
+            "fields": ("region", "qualification", "position", "subject")
         }),
     )
 

@@ -47,3 +47,5 @@ shortuuid
 requests
 django-redis
 dotenv
+django-select2
+django-autocomplete-light

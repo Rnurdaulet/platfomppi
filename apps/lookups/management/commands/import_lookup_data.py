@@ -218,21 +218,37 @@ class Command(BaseCommand):
             return
 
         School.objects.all().delete()
+
+        # Загружаем справочники в память
+        region_map = {str(r.external_id): r for r in Region.objects.all()}
+        location_map = {str(l.external_id): l for l in Location.objects.all()}
+        school_type_map = {str(t.external_id): t for t in SchoolType.objects.all()}
+        school_form_map = {str(f.external_id): f for f in SchoolForm.objects.all()}
+
+        def resolve(map_, key):
+            key = key.strip()
+            return map_.get(key) if key.isdigit() else None
+
+        schools = []
+
         with open(filepath, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile, delimiter=';')
             for row in reader:
-                region = Region.objects.filter(external_id=row["region"]).first()
-                location = Location.objects.filter(external_id=row["location"]).first()
-                school_type = SchoolType.objects.filter(external_id=row["schooltype"]).first()
-                school_form = SchoolForm.objects.filter(external_id=row["schoolform"]).first()
+                region = resolve(region_map, row["region"])
+                location = resolve(location_map, row["location"])
+                school_type = resolve(school_type_map, row["schooltype"])
+                school_form = resolve(school_form_map, row["schoolform"])
 
-                School.objects.create(
-                    name_ru=row["name_ru"],
-                    name_kk=row["name_kk"],
+                school = School(
+                    name_ru=row["name_ru"].strip(),
+                    name_kk=row["name_kk"].strip(),
                     region=region,
                     location=location,
                     school_type=school_type,
                     school_form=school_form,
-                    external_id=row["external_id"]
+                    external_id=int(row["external_id"]),
                 )
-        self.stdout.write(self.style.SUCCESS("✅ Школы загружены."))
+                schools.append(school)
+
+        School.objects.bulk_create(schools, batch_size=1000)
+        self.stdout.write(self.style.SUCCESS(f"✅ Загружено школ: {len(schools)}"))

@@ -2,7 +2,7 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from apps.lookups.models import Branch, QualificationCategory, Region
+from apps.lookups.models import Branch, QualificationCategory, Region, Position, Subject, School
 
 
 class User(AbstractUser):
@@ -56,14 +56,31 @@ class ParticipantProfile(models.Model):
     )
 
     full_name = models.CharField(max_length=255, verbose_name="Ф.И.О. (из ЭЦП)")
-    position = models.CharField(max_length=255, verbose_name="Должность")
+    position = models.ForeignKey(
+        Position,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Должность"
+    )
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Предмет"
+    )
     qualification = models.ForeignKey(
         QualificationCategory,
         on_delete=models.SET_NULL,
         null=True,
         verbose_name="Квалификационная категория"
     )
-    organization_name = models.CharField(max_length=255, verbose_name="Название организации образования")
+    school = models.ForeignKey(
+        School,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="Школа / Учреждение"
+    )
     organization_address = models.CharField(max_length=255, verbose_name="Адрес организации образования")
     phone = models.CharField(max_length=32, verbose_name="Контактный телефон")
     email = models.EmailField(verbose_name="Электронная почта")

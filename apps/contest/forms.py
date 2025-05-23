@@ -1,21 +1,46 @@
+from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from apps.contest.models import Application
-from apps.lookups.models import Region, QualificationCategory
+
 from apps.accounts.models import ParticipantProfile
+from apps.contest.models import Application
+from apps.lookups.models import Region, QualificationCategory, School, Position, Subject
 
 
 class ApplicationForm(forms.ModelForm):
-    # поля из профиля участника
     full_name = forms.CharField(max_length=255, label="Ф.И.О.")
-    position = forms.CharField(max_length=255, label="Должность")
-    qualification = forms.ModelChoiceField(queryset=QualificationCategory.objects.all(), label="Квалификационная категория")
-    organization_name = forms.CharField(max_length=255, label="Название организации")
+    position = forms.ModelChoiceField(
+        queryset=Position.objects.all(),
+        label="Должность",
+        widget=autocomplete.ModelSelect2(url="position-autocomplete")
+    )
+    subject = forms.ModelChoiceField(
+        queryset=Subject.objects.all(),
+        label="Предмет",
+        widget=autocomplete.ModelSelect2(url="subject-autocomplete"),
+        required=False
+    )
+    school = forms.ModelChoiceField(
+        queryset=School.objects.none(),
+        label="Организация образования",
+        widget=autocomplete.ModelSelect2(
+            url="school-autocomplete",
+            forward=["region"]
+        )
+    )
     organization_address = forms.CharField(max_length=255, label="Адрес организации")
     phone = forms.CharField(max_length=32, label="Телефон")
     email = forms.EmailField(label="Электронная почта")
-    region = forms.ModelChoiceField(queryset=Region.objects.all(), label="Регион")
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all(),
+        label="Регион",
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    qualification = forms.ModelChoiceField(
+        queryset=QualificationCategory.objects.all(),
+        label="Квалификационная категория"
+    )
     consent = forms.BooleanField(label="Согласие на обработку персональных данных", required=True)
 
     class Meta:
@@ -26,47 +51,44 @@ class ApplicationForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-        # Предзаполнение из профиля
-        if self.user:
-            profile = getattr(self.user, "participant_profile", None)
-            if profile:
-                self.initial.update({
-                    "full_name": profile.full_name,
-                    "position": profile.position,
-                    "qualification": profile.qualification,
-                    "organization_name": profile.organization_name,
-                    "organization_address": profile.organization_address,
-                    "phone": profile.phone,
-                    "email": profile.email,
-                    "region": profile.region,
-                    "consent": profile.consent,
-                })
-            elif not self.instance.pk:
-                self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name}"
+        profile = getattr(self.user, "participant_profile", None)
+        if profile:
+            self.initial.update({
+                "full_name": profile.full_name,
+                "position": profile.position,
+                "subject": getattr(profile, "subject", None),
+                "school": getattr(profile, "school", None),
+                "organization_address": profile.organization_address,
+                "phone": profile.phone,
+                "email": profile.email,
+                "region": profile.region,
+                "qualification": profile.qualification,
+                "consent": profile.consent,
+            })
+        elif not self.instance.pk:
+            self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name}"
 
-        # Добавление CSS-классов и отображение ошибок
+        if "region" in self.data:
+            try:
+                region_id = int(self.data.get("region"))
+                self.fields["school"].queryset = School.objects.filter(region_id=region_id)
+            except (ValueError, TypeError):
+                self.fields["school"].queryset = School.objects.none()
+        elif profile and profile.region:
+            self.fields["school"].queryset = School.objects.filter(region=profile.region)
+        self.fields["phone"].widget.attrs.update({"id": "phone"})
+
         for name, field in self.fields.items():
             base_class = "form-control"
             if isinstance(field.widget, forms.CheckboxInput):
                 base_class = "form-check-input"
-            elif isinstance(field.widget, forms.Select):
+            elif isinstance(field.widget, forms.Select) or isinstance(field.widget, autocomplete.ModelSelect2):
                 base_class = "form-select"
-
             if self.errors.get(name):
                 base_class += " is-invalid"
             elif self.is_bound:
                 base_class += " is-valid"
-
             field.widget.attrs.setdefault("class", base_class)
-
-        self.fields["consent"].error_messages = {
-            "required": "Необходимо дать согласие на обработку персональных данных."
-        }
-
-        # Блокировка при is_locked
-        if self.instance and self.instance.is_locked:
-            for field in self.fields.values():
-                field.disabled = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -79,20 +101,19 @@ class ApplicationForm(forms.ModelForm):
             application = super().save(commit=False)
             application.participant = self.user
 
-            # Профиль участника
             profile, _ = ParticipantProfile.objects.get_or_create(user=self.user)
             profile.full_name = self.cleaned_data["full_name"]
             profile.position = self.cleaned_data["position"]
-            profile.qualification = self.cleaned_data["qualification"]
-            profile.organization_name = self.cleaned_data["organization_name"]
+            profile.subject = self.cleaned_data["subject"]
+            profile.school = self.cleaned_data["school"]
             profile.organization_address = self.cleaned_data["organization_address"]
             profile.phone = self.cleaned_data["phone"]
             profile.email = self.cleaned_data["email"]
             profile.region = self.cleaned_data["region"]
+            profile.qualification = self.cleaned_data["qualification"]
             profile.consent = self.cleaned_data["consent"]
             profile.save()
 
-            # Обновим email в user, если нужно
             if self.user.email != self.cleaned_data["email"]:
                 self.user.email = self.cleaned_data["email"]
                 self.user.save(update_fields=["email"])
