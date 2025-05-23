@@ -23,6 +23,7 @@ def verify_ecp_signature(signed_data: str, nonce: str) -> tuple[str, str]:
     iin = subject.get("iin")
     name = subject.get("commonName")
 
+
     if not iin or not name:
         raise Exception("Невозможно извлечь IIN или ФИО из сертификата")
 
