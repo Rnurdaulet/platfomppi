@@ -101,6 +101,7 @@ class ApplicationForm(forms.ModelForm):
 
         if profile and not profile.school and profile.organization_name:
             self.initial["organization_name"] = profile.organization_name
+
         # Делаем school необязательным, если передан organization_name или found_school явно False
         found_school_val = self.data.get("found_school")
         if found_school_val in ["false", "False", "", None] or self.initial.get("organization_name"):
@@ -124,14 +125,16 @@ class ApplicationForm(forms.ModelForm):
         found_school = self.data.get("found_school")
 
         if found_school in ["false", "False", "", None]:
-            # Пользователь не нашёл школу
+            # Пользователь не нашёл школу, требуется вручную указать название
+            school = cleaned_data.get("school")
+            organization_name = cleaned_data.get("organization_name")
             cleaned_data["school"] = None
-            if not cleaned_data.get("organization_name"):
-                self.add_error("organization_name", "Укажите название вашей организации.")
         else:
-            # Пользователь выбрал школу из списка
+            # Пользователь выбрал школу из справочника
             if not cleaned_data.get("school"):
                 self.add_error("school", "Выберите организацию из списка.")
+            # очистим organization_name, чтобы избежать дублирования
+            cleaned_data["organization_name"] = ""
 
         if self.instance and self.instance.is_locked:
             raise ValidationError("Заявка уже подписана и не может быть изменена.")

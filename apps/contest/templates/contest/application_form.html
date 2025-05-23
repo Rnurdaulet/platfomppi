@@ -31,6 +31,8 @@
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 {{ form.non_field_errors }}
+            <input type="hidden" name="found_school" id="found_school" value="false">
+
                 <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Об участнике </h4></span>
 
                 <div class="mb-3">
@@ -226,15 +228,19 @@
             const toggle = document.getElementById("manualSchoolToggle");
             const field = document.getElementById("manualSchoolField");
             const schoolSelect = document.getElementById("id_school");
+            const found_school = document.getElementById("found_school");
+
             document.getElementById("manualSchoolToggle").value = "false";
 
             toggle.addEventListener("change", function () {
                 if (toggle.checked) {
                     field.classList.remove("d-none");
                     schoolSelect.closest(".mb-3").classList.add("d-none");
+                    found_school.value = false;
                 } else {
                     field.classList.add("d-none");
                     schoolSelect.closest(".mb-3").classList.remove("d-none");
+                    found_school.value = true;
                 }
             });
 
