@@ -67,7 +67,7 @@ class ParticipantProfileAdmin(ModelAdmin):
             "fields": ("user", "full_name", "email", "phone", "consent")
         }),
         ("Организация", {
-            "fields": ("school", "organization_address")
+            "fields": ("school", "organization_name","organization_address")
         }),
         ("Регион и квалификация", {
             "fields": ("region", "qualification", "position", "subject")

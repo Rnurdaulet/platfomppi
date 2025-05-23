@@ -39,6 +39,16 @@ class ApplicationForm(forms.ModelForm):
             attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
         )
     )
+    organization_name = forms.CharField(
+        max_length=255,
+        label="Название организации вручную",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Если не нашли в списке"})
+    )
+    found_school = forms.BooleanField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
 
     organization_address = forms.CharField(max_length=255, label="Адрес организации")
     phone = forms.CharField(max_length=32, label="Телефон")
@@ -89,6 +99,9 @@ class ApplicationForm(forms.ModelForm):
             self.fields["school"].queryset = School.objects.filter(region=profile.region)
         self.fields["phone"].widget.attrs.update({"id": "phone"})
 
+        if profile and not profile.school and profile.organization_name:
+            self.initial["organization_name"] = profile.organization_name
+
         for name, field in self.fields.items():
             base_class = "form-control"
             if isinstance(field.widget, forms.CheckboxInput):
@@ -116,13 +129,23 @@ class ApplicationForm(forms.ModelForm):
             profile.full_name = self.cleaned_data["full_name"]
             profile.position = self.cleaned_data["position"]
             profile.subject = self.cleaned_data["subject"]
-            profile.school = self.cleaned_data["school"]
+            # profile.school = self.cleaned_data["school"]
             profile.organization_address = self.cleaned_data["organization_address"]
             profile.phone = self.cleaned_data["phone"]
             profile.email = self.cleaned_data["email"]
             profile.region = self.cleaned_data["region"]
             profile.qualification = self.cleaned_data["qualification"]
             profile.consent = self.cleaned_data["consent"]
+
+            if self.cleaned_data["organization_name"]:
+                profile.school = None
+                profile.organization_name = self.cleaned_data["organization_name"]
+                profile.found_school = False
+            else:
+                profile.school = self.cleaned_data["school"]
+                profile.organization_name = ""
+                profile.found_school = True
+
             profile.save()
 
             if self.user.email != self.cleaned_data["email"]:

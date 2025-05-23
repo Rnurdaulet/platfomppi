@@ -81,6 +81,14 @@ class ParticipantProfile(models.Model):
         null=True,
         verbose_name="Школа / Учреждение"
     )
+    organization_name = models.CharField(
+        max_length=512,
+        blank=True,
+        null=True,
+        verbose_name="Название организации вручную"
+    )
+    found_school = models.BooleanField(default=True, verbose_name="Нашёл организацию в справочнике")
+
     organization_address = models.CharField(max_length=255, verbose_name="Адрес организации образования")
     phone = models.CharField(max_length=32, verbose_name="Контактный телефон")
     email = models.EmailField(verbose_name="Электронная почта")
