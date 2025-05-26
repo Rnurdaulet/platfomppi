@@ -40,14 +40,19 @@
                             <dt class="col-sm-5">{% trans "Предмет" %}</dt>
                             <dd class="col-sm-7">{{ profile.subject }}</dd>
 
-                            <dt class="col-sm-5">{% trans "Организация" %}</dt>
+                            <dt class="col-sm-5">{% trans "Организация образования" %}</dt>
                             <dd class="col-sm-7">
-                                {% if profile.school %}
-                                    {{ profile.school }}
-                                {% else %}
-                                    {{ profile.organization_name }}
-                                {% endif %}
+                                {% with school=profile.school name=profile.organization_name %}
+                                    {% if school %}
+                                        {{ school.name }}
+                                    {% elif name %}
+                                        {{ name }}
+                                    {% else %}
+                                        <span class="text-muted">{% trans "Не указано" %}</span>
+                                    {% endif %}
+                                {% endwith %}
                             </dd>
+
 
                             <dt class="col-sm-5">{% trans "Адрес организации" %}</dt>
                             <dd class="col-sm-7">{{ profile.organization_address }}</dd>
