@@ -2,6 +2,7 @@ from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.models import ParticipantProfile
@@ -65,7 +66,12 @@ class ApplicationForm(forms.ModelForm):
         queryset=QualificationCategory.objects.all(),
         label=_("Квалификационная категория")
     )
-    consent = forms.BooleanField(label=_("Согласие на обработку персональных данных"), required=True)
+    consent = forms.BooleanField(
+        label=mark_safe(
+            _('Я ознакомлен(а) и соглашаюсь с <a href="/privacy" target="_blank">политикой конфиденциальности</a>.')
+        ),
+        required=True
+    )
 
     class Meta:
         model = Application
