@@ -1,0 +1,397 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-26 10:53+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+#: apps/accounts/models.py:16
+msgid "Участник"
+msgstr "Қатысушы"
+
+#: apps/accounts/models.py:17
+msgid "Эксперт"
+msgstr "Сарапшы"
+
+#: apps/accounts/models.py:18
+msgid "СуперЭксперт"
+msgstr "Суперсарапшы"
+
+#: apps/accounts/models.py:19
+msgid "Админ"
+msgstr "Әкімші"
+
+#: apps/accounts/models.py:26
+msgid "Роль"
+msgstr "Рөлі"
+
+#: apps/accounts/models.py:33
+msgid "Отчество"
+msgstr "Әкесінің аты"
+
+#: apps/accounts/models.py:38
+msgid "Пользователь"
+msgstr "Пайдаланушы"
+
+#: apps/accounts/models.py:39
+msgid "Пользователи"
+msgstr "Пайдаланушылар"
+
+#: apps/accounts/templates/accounts/ecp_login.html:5
+msgid "Вход через ЭЦП"
+msgstr "ЭЦҚ арқылы кіру"
+
+#: apps/accounts/templates/accounts/ecp_login.html:34
+msgid "Вход с использованием ЭЦП"
+msgstr "ЭЦҚ қолдану арқылы кіру"
+
+#: apps/accounts/templates/accounts/ecp_login.html:35
+msgid "Авторизуйтесь безопасно, используя NCAlayer для подписи."
+msgstr "Қол қою үшін NCALayer пайдаланып, қауіпсіз түрде кіруді жүзеге асырыңыз."
+
+#: apps/accounts/templates/accounts/ecp_login.html:36
+msgid "Убедитесь, что NCAlayer запущен на вашем устройстве."
+msgstr "NCALayer құрылғыңызда іске қосылғанына көз жеткізіңіз."
+
+#: apps/accounts/templates/accounts/ecp_login.html:43 templates/index.html:26
+msgid "Войти через ЭЦП"
+msgstr "ЭЦҚ арқылы кіру"
+
+#: apps/accounts/templates/accounts/ecp_login.html:46
+msgid "Ожидание действия..."
+msgstr "Әрекетті күту..."
+
+#: apps/accounts/templates/accounts/ecp_login.html:49
+msgid "Нужна помощь с ЭЦП?"
+msgstr "ЭЦҚ бойынша көмек керек пе?"
+
+#: apps/accounts/templates/accounts/ecp_login.html:62
+msgid "Подключение к NCALayer..."
+msgstr "NCALayer-ге қосылу..."
+
+#: apps/accounts/templates/accounts/ecp_login.html:63
+msgid "Подключено! Выполняется подписание..."
+msgstr "Қосылды! Қол қойылуда..."
+
+#: apps/accounts/templates/accounts/ecp_login.html:64
+msgid "Ошибка подписи:"
+msgstr "Қол қою қатесі:"
+
+#: apps/accounts/templates/accounts/ecp_login.html:65
+msgid "Подпись получена, отправка на сервер..."
+msgstr "Қол қойылды, серверге жіберілуде..."
+
+#: apps/accounts/templates/accounts/ecp_login.html:66
+msgid "Подпись верна!"
+msgstr "Қол қою дұрыс!"
+
+#: apps/accounts/templates/accounts/ecp_login.html:67
+msgid "Ошибка проверки подписи:"
+msgstr "Қол қоюды тексеру қатесі:"
+
+#: apps/accounts/templates/accounts/ecp_login.html:68
+msgid "Не удалось подключиться к NCALayer:"
+msgstr "NCALayer-ге қосылу сәтсіз аяқталды:"
+
+#: apps/accounts/views.py:29
+msgid "Неверный формат запроса."
+msgstr "Сұраныс пішімі дұрыс емес."
+
+#: apps/contest/forms.py:14
+#: apps/contest/templates/contest/application_preview.html:28
+#: templates/index.html:44
+msgid "Ф.И.О."
+msgstr "Аты-жөні"
+
+#: apps/contest/forms.py:18
+#: apps/contest/templates/contest/application_preview.html:37
+msgid "Должность"
+msgstr "Қызметі"
+
+#: apps/contest/forms.py:27
+#: apps/contest/templates/contest/application_preview.html:40
+msgid "Предмет"
+msgstr "Пәні"
+
+#: apps/contest/forms.py:37
+msgid "Организация образования"
+msgstr "Білім беру ұйымы"
+
+#: apps/contest/forms.py:47
+msgid "Название организации вручную"
+msgstr "Ұйым атауын қолмен енгізу"
+
+#: apps/contest/forms.py:49
+msgid "Если не нашли в списке"
+msgstr "Егер тізімнен таппасаңыз"
+
+#: apps/contest/forms.py:57
+#: apps/contest/templates/contest/application_preview.html:52
+msgid "Адрес организации"
+msgstr "Ұйымның мекенжайы"
+
+#: apps/contest/forms.py:58
+#: apps/contest/templates/contest/application_preview.html:58
+msgid "Телефон"
+msgstr "Телефон"
+
+#: apps/contest/forms.py:59
+#: apps/contest/templates/contest/application_preview.html:55
+msgid "Электронная почта"
+msgstr "Электрондық пошта"
+
+#: apps/contest/forms.py:62
+#: apps/contest/templates/contest/application_form.html:107
+#: apps/contest/templates/contest/application_preview.html:31
+msgid "Регион"
+msgstr "Өңір"
+
+#: apps/contest/forms.py:67
+#: apps/contest/templates/contest/application_preview.html:34
+msgid "Квалификационная категория"
+msgstr "Біліктілік санаты"
+
+#: apps/contest/forms.py:71
+msgid ""
+"Я ознакомлен(а) и соглашаюсь с <a href=\"/privacy\" "
+"target=\"_blank\">политикой конфиденциальности</a>."
+msgstr ""
+"Мен <a href=\"/privacy\" target=\"_blank\">құпиялық саясатымен</a> танысып, келісемін."
+
+#: apps/contest/forms.py:138
+msgid "Выберите организацию из списка."
+msgstr "Тізімнен ұйымды таңдаңыз."
+
+#: apps/contest/forms.py:142
+msgid "Заявка уже подписана и не может быть изменена."
+msgstr "Өтінімге қол қойылған және оны өзгерту мүмкін емес."
+
+#: apps/contest/templates/contest/application_form.html:6
+msgid "Подача заявки"
+msgstr "Өтінім беру"
+
+#: apps/contest/templates/contest/application_form.html:21
+msgid "Форма заявки на конкурс"
+msgstr "Байқауға өтінім формасы"
+
+#: apps/contest/templates/contest/application_form.html:22
+msgid ""
+"Уважаемые участники! Просим заполнить все поля заявки внимательно и "
+"максимально полно. Перед отправкой убедитесь в корректности введённых данных "
+"— предоставленные сведения будут являться основанием для экспертной оценки "
+"конкурсных материалов."
+msgstr ""
+"Құрметті қатысушылар! Өтінімдегі барлық өрістерді мұқият және толығымен толтыруды сұраймыз. "
+"Жібермес бұрын енгізілген деректердің дұрыстығына көз жеткізіңіз — ұсынылған ақпарат "
+"байқау материалдарын сараптамалық бағалаудың негізі болады."
+
+#: apps/contest/templates/contest/application_form.html:36
+msgid "Об участнике"
+msgstr "Қатысушы туралы"
+
+#: apps/contest/templates/contest/application_form.html:132
+msgid "Не нашёл свою организацию"
+msgstr "Ұйымымды таба алмадым"
+
+#: apps/contest/templates/contest/application_form.html:155
+msgid "Конкурс"
+msgstr "Байқау"
+
+#: apps/contest/templates/contest/application_form.html:190
+msgid "Файл заявки"
+msgstr "Өтінім файлы"
+
+#: apps/contest/templates/contest/application_form.html:215
+msgid "Сохранить"
+msgstr "Сақтау"
+
+#: apps/contest/templates/contest/application_form.html:219
+msgid "Назад к заявке"
+msgstr "Өтінімге оралу"
+
+#: apps/contest/templates/contest/application_preview.html:4
+msgid "Предпросмотр заявки"
+msgstr "Өтінімді алдын ала қарау"
+
+#: apps/contest/templates/contest/application_preview.html:20
+msgid "Ваша заявка принята"
+msgstr "Сіздің өтініміңіз қабылданды"
+
+#: apps/contest/templates/contest/application_preview.html:22
+#: templates/index.html:37
+msgid "Спасибо за участие! Ваша заявка успешно отправлена."
+msgstr "Қатысқаныңыз үшін рақмет! Сіздің өтініміңіз сәтті жіберілді."
+
+#: apps/contest/templates/contest/application_preview.html:43
+msgid "Организация"
+msgstr "Ұйым"
+
+#: apps/contest/templates/contest/application_preview.html:61
+msgid "Название конкурсного материала"
+msgstr "Байқау материалының атауы"
+
+#: apps/contest/templates/contest/application_preview.html:64
+msgid "Направление конкурса"
+msgstr "Байқау бағыты"
+
+#: apps/contest/templates/contest/application_preview.html:67
+msgid "Файл"
+msgstr "Файл"
+
+#: apps/contest/templates/contest/application_preview.html:71
+msgid "Скачать файл"
+msgstr "Файлды жүктеу"
+
+#: apps/contest/templates/contest/application_preview.html:82
+msgid "Изменить"
+msgstr "Өзгерту"
+
+#: apps/contest/templates/contest/application_preview.html:90
+msgid "Заявка отправлена."
+msgstr "Өтінім жіберілді."
+
+#: apps/contest/validators.py:11
+msgid "Размер файла не должен превышать 5 МБ."
+msgstr "Файл өлшемі 5 МБ-тан аспауы тиіс."
+
+#: apps/contest/validators.py:16
+msgid "Файл должен быть в формате .docx или .doc"
+msgstr "Файл .docx немесе .doc форматында болуы керек"
+
+#: apps/contest/views.py:40
+msgid "Приём заявок завершён."
+msgstr "Өтінімдерді қабылдау аяқталды."
+
+#: apps/contest/views.py:55
+msgid "Заявка создана."
+msgstr "Өтінім жасалды."
+
+#: apps/contest/views.py:64 apps/contest/views.py:73
+msgid "Редактирование заявки недоступно."
+msgstr "Өтінімді өңдеу қолжетімсіз."
+
+#: apps/contest/views.py:81
+msgid "Изменения сохранены."
+msgstr "Өзгерістер сақталды."
+
+#: apps/contest/views.py:90 templates/index.html:71
+msgid "Вы ещё не подали заявку."
+msgstr "Сіз әлі өтінім берген жоқсыз."
+
+#: apps/contest/views.py:100
+msgid "Заявка не найдена."
+msgstr "Өтінім табылмады."
+
+#: apps/contest/views.py:103
+msgid "Заявка уже подписана."
+msgstr "Өтінімге қол қойылған."
+
+#: apps/contest/views.py:114
+msgid "Подпись не соответствует вашему ИИН."
+msgstr "Қолтаңба сіздің ЖСН-ға сәйкес келмейді."
+
+#: templates/403_participant_only.html:4
+msgid "Доступ ограничен"
+msgstr "Қол жеткізу шектелген"
+
+#: templates/403_participant_only.html:10
+msgid "Доступ только для участников"
+msgstr "Қол жеткізу тек қатысушылар үшін"
+
+#: templates/403_participant_only.html:11
+msgid ""
+"Извините, но эта страница доступна только пользователям с ролью 'Участник'."
+msgstr ""
+"Кешіріңіз, бұл бетке тек 'Қатысушы' рөлі бар пайдаланушылар ғана қол жеткізе алады."
+
+#: templates/403_participant_only.html:13
+msgid "На главную"
+msgstr "Басты бетке оралу"
+
+#: templates/404.html:5
+msgid "404"
+msgstr "404"
+
+#: templates/404.html:16
+msgid "Страница не найдена"
+msgstr "Бет табылмады"
+
+#: templates/404.html:17
+msgid "К сожалению, запрошенная страница не существует или была перемещена."
+msgstr "Өкінішке орай, сұралған бет жоқ немесе басқа орынға ауыстырылған."
+
+#: templates/404.html:20
+msgid "Вернуться на главную"
+msgstr "Басты бетке оралу"
+
+#: templates/base-h100.html:7 templates/base.html:7 templates/index.html:5
+#: templates/index.html:15
+msgid "Панорама педагогических идей"
+msgstr "Педагогикалық идеялар панорамасы"
+
+#: templates/includes/header.html:29
+msgid "Войти"
+msgstr "Кіру"
+
+#: templates/includes/header.html:36
+msgid "Моя заявка"
+msgstr "Менің өтінімім"
+
+#: templates/includes/header.html:40 templates/index.html:74
+msgid "Подать заявку"
+msgstr "Өтінім беру"
+
+#: templates/includes/header.html:49
+msgid "Выход"
+msgstr "Шығу"
+
+#: templates/index.html:16
+msgid ""
+"Площадка для обмена эффективными педагогическими практиками в сфере "
+"функциональной грамотности."
+msgstr ""
+"Функционалдық сауаттылық саласындағы тиімді педагогикалық тәжірибемен алмасу алаңы."
+
+#: templates/index.html:17
+msgid "Приём заявок на региональный этап конкурса"
+msgstr "Байқаудың өңірлік кезеңіне өтінім қабылдау"
+
+#: templates/index.html:22
+msgid "Для подачи заявки необходимо войти через ЭЦП."
+msgstr "Өтінім беру үшін ЭЦҚ арқылы кіру қажет."
+
+#: templates/index.html:35
+msgid "Ваша заявка"
+msgstr "Сіздің өтініміңіз"
+
+#: templates/index.html:50
+msgid "Статус"
+msgstr "Күйі"
+
+#: templates/index.html:52
+msgid "Отправлена"
+msgstr "Жіберілді"
+
+#: templates/index.html:64
+msgid "Перейти к заявке"
+msgstr "Өтінімге өту"
+
+#: templates/index.html:80
+msgid "Подача заявок завершена."
+msgstr "Өтінім қабылдау аяқталды."
+
+#: templates/index.html:88
+msgid "Подача заявок доступна только участникам."
+msgstr "Өтінім беру тек қатысушыларға қолжетімді."
