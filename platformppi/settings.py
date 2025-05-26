@@ -98,6 +98,17 @@ else:
         }
     }
 
+if not USE_SQLITE:
+    SECURE_SSL_REDIRECT = True  # автоматический редирект http → https
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"  # или SAMEORIGIN если используешь iframe
+    SECURE_HSTS_SECONDS = 31536000  # Включает HSTS на 1 год
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -157,8 +168,8 @@ EMAIL_HOST = "smtp-mail.outlook.com"  # или smtp.gmail.com, smtp.mail.ru и �
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "ppi@orleu-edu.kz"
-EMAIL_HOST_PASSWORD = "123987Pp"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
@@ -240,14 +251,22 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
-
+        "celery": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": False,
+        },
         "apps": {
             "handlers": ["file"],
             "level": "INFO",
             "propagate": True,
-        }
+        },
 
     },
+    "root": {
+        "handlers": ["file", "console"],
+        "level": "WARNING",
+    }
 }
 
 import sentry_sdk
