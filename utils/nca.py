@@ -21,8 +21,15 @@ def verify_ecp_signature(signed_data: str, nonce: str) -> tuple[str, str]:
 
     subject = result["signers"][0]["certificates"][0]["subject"]
     iin = subject.get("iin")
-    name = subject.get("commonName")
+    middlename = None
+    # Попробуем извлечь отчество из DN, если дано
+    dn = subject.get("dn", "")
+    for part in dn.split(","):
+        if part.strip().startswith("GIVENNAME="):
+            middlename = part.split("=", 1)[1].strip()
+            break
 
+    name = f"{subject.get("commonName")} {middlename}"
 
     if not iin or not name:
         raise Exception("Невозможно извлечь IIN или ФИО из сертификата")

@@ -2,33 +2,41 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.lookups.models import Branch, QualificationCategory, Region, Position, Subject, School
 
 
 class User(AbstractUser):
     """
-    Кастомная модель пользователя с ролями и опциональной привязкой к филиалу.
+    Кастомная модель пользователя с ролями, отчеством и опциональной привязкой к филиалу.
     """
 
     ROLE_CHOICES = [
-        ("participant", "Участник"),
-        ("expert", "Эксперт"),
-        ("super_expert", "СуперЭксперт"),
-        ("admin", "Админ"),
+        ("participant", _("Участник")),
+        ("expert", _("Эксперт")),
+        ("super_expert", _("СуперЭксперт")),
+        ("admin", _("Админ")),
     ]
 
     role = models.CharField(
         max_length=32,
         choices=ROLE_CHOICES,
         default="participant",
-        verbose_name="Роль"
+        verbose_name=_("Роль")
+    )
+
+    middlename = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        verbose_name=_("Отчество")
     )
 
     class Meta:
         db_table = "accounts_user"
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = _("Пользователь")
+        verbose_name_plural = _("Пользователи")
         ordering = ["-date_joined"]
 
     @staticmethod
@@ -43,8 +51,10 @@ class User(AbstractUser):
         return None
 
     def __str__(self):
-        return f"{self.username} ({self.get_role_display()})"
-
+        full_name = f"{self.last_name} {self.first_name}"
+        if self.middlename:
+            full_name += f" {self.middlename}"
+        return f"{full_name.strip()} ({self.get_role_display()})"
 
 
 class ParticipantProfile(models.Model):

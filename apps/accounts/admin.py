@@ -15,7 +15,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Персональные данные", {"fields": ("first_name", "last_name", "email", "role")}),
+        ("Персональные данные", {"fields": ("first_name", "last_name","middlename", "email", "role")}),
         ("Права доступа", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Прочее", {"fields": ("last_login", "date_joined")}),
     )

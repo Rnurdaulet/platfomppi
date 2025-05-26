@@ -2,6 +2,7 @@ from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.models import ParticipantProfile
 from apps.contest.models import Application
@@ -9,11 +10,11 @@ from apps.lookups.models import Region, QualificationCategory, School, Position,
 
 
 class ApplicationForm(forms.ModelForm):
-    full_name = forms.CharField(max_length=255, label="Ф.И.О.")
+    full_name = forms.CharField(max_length=255, label=_("Ф.И.О."))
 
     position = forms.ModelChoiceField(
         queryset=Position.objects.all(),
-        label="Должность",
+        label=_("Должность"),
         widget=autocomplete.ModelSelect2(
             url="position-autocomplete",
             attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
@@ -22,7 +23,7 @@ class ApplicationForm(forms.ModelForm):
 
     subject = forms.ModelChoiceField(
         queryset=Subject.objects.all(),
-        label="Предмет",
+        label=_("Предмет"),
         required=False,
         widget=autocomplete.ModelSelect2(
             url="subject-autocomplete",
@@ -32,37 +33,39 @@ class ApplicationForm(forms.ModelForm):
 
     school = forms.ModelChoiceField(
         queryset=School.objects.none(),
-        label="Организация образования",
+        label=_("Организация образования"),
         widget=autocomplete.ModelSelect2(
             url="school-autocomplete",
             forward=["region"],
             attrs={"data-theme": "bootstrap-5", "data-width": "100%"}
         )
     )
+
     organization_name = forms.CharField(
         max_length=255,
-        label="Название организации вручную",
+        label=_("Название организации вручную"),
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": "Если не нашли в списке"})
+        widget=forms.TextInput(attrs={"placeholder": _("Если не нашли в списке")})
     )
+
     found_school = forms.BooleanField(
         required=False,
         widget=forms.HiddenInput()
     )
 
-    organization_address = forms.CharField(max_length=255, label="Адрес организации")
-    phone = forms.CharField(max_length=32, label="Телефон")
-    email = forms.EmailField(label="Электронная почта")
+    organization_address = forms.CharField(max_length=255, label=_("Адрес организации"))
+    phone = forms.CharField(max_length=32, label=_("Телефон"))
+    email = forms.EmailField(label=_("Электронная почта"))
     region = forms.ModelChoiceField(
         queryset=Region.objects.all(),
-        label="Регион",
+        label=_("Регион"),
         widget=forms.Select(attrs={"class": "form-select"})
     )
     qualification = forms.ModelChoiceField(
         queryset=QualificationCategory.objects.all(),
-        label="Квалификационная категория"
+        label=_("Квалификационная категория")
     )
-    consent = forms.BooleanField(label="Согласие на обработку персональных данных", required=True)
+    consent = forms.BooleanField(label=_("Согласие на обработку персональных данных"), required=True)
 
     class Meta:
         model = Application
@@ -87,7 +90,7 @@ class ApplicationForm(forms.ModelForm):
                 "consent": profile.consent,
             })
         elif not self.instance.pk:
-            self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name}"
+            self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name} {self.user.middlename}"
 
         if "region" in self.data:
             try:
@@ -102,7 +105,6 @@ class ApplicationForm(forms.ModelForm):
         if profile and not profile.school and profile.organization_name:
             self.initial["organization_name"] = profile.organization_name
 
-        # Делаем school необязательным, если передан organization_name или found_school явно False
         found_school_val = self.data.get("found_school")
         if found_school_val in ["false", "False", "", None] or self.initial.get("organization_name"):
             self.fields["school"].required = False
@@ -111,7 +113,7 @@ class ApplicationForm(forms.ModelForm):
             base_class = "form-control"
             if isinstance(field.widget, forms.CheckboxInput):
                 base_class = "form-check-input"
-            elif isinstance(field.widget, forms.Select) or isinstance(field.widget, autocomplete.ModelSelect2):
+            elif isinstance(field.widget, (forms.Select, autocomplete.ModelSelect2)):
                 base_class = "form-select"
             if self.errors.get(name):
                 base_class += " is-invalid"
@@ -121,23 +123,17 @@ class ApplicationForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-
         found_school = self.data.get("found_school")
 
         if found_school in ["false", "False", "", None]:
-            # Пользователь не нашёл школу, требуется вручную указать название
-            school = cleaned_data.get("school")
-            organization_name = cleaned_data.get("organization_name")
             cleaned_data["school"] = None
         else:
-            # Пользователь выбрал школу из справочника
             if not cleaned_data.get("school"):
-                self.add_error("school", "Выберите организацию из списка.")
-            # очистим organization_name, чтобы избежать дублирования
+                self.add_error("school", _("Выберите организацию из списка."))
             cleaned_data["organization_name"] = ""
 
         if self.instance and self.instance.is_locked:
-            raise ValidationError("Заявка уже подписана и не может быть изменена.")
+            raise ValidationError(_("Заявка уже подписана и не может быть изменена."))
         return cleaned_data
 
     def save(self, commit=True):
@@ -149,7 +145,6 @@ class ApplicationForm(forms.ModelForm):
             profile.full_name = self.cleaned_data["full_name"]
             profile.position = self.cleaned_data["position"]
             profile.subject = self.cleaned_data["subject"]
-            # profile.school = self.cleaned_data["school"]
             profile.organization_address = self.cleaned_data["organization_address"]
             profile.phone = self.cleaned_data["phone"]
             profile.email = self.cleaned_data["email"]

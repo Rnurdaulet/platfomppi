@@ -49,12 +49,19 @@ class EcpLoginView(View):
             )
         else:
             # fallback на участника
-            last_name, first_name, *_ = full_name.split()
+            parts = full_name.strip().split()
+
+            # Надёжно распарсим ФИО: Фамилия Имя [Отчество]
+            last_name = parts[0] if len(parts) > 0 else ""
+            first_name = parts[1] if len(parts) > 1 else ""
+            middlename = parts[2] if len(parts) > 2 else ""
+
             user, _ = user_model.objects.get_or_create(
                 username=iin,
                 defaults={
                     "first_name": first_name,
                     "last_name": last_name,
+                    "middlename": middlename,
                     "role": "participant",
                     "is_active": True,
                 }
