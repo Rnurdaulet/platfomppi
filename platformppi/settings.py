@@ -161,3 +161,14 @@ HANDLER404 = "platformppi.views.handler404"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp-mail.outlook.com"  # или smtp.gmail.com, smtp.mail.ru и т.д.
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "ppi@orleu-edu.kz"
+EMAIL_HOST_PASSWORD = "123987Pp"
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

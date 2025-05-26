@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.accounts.models import ParticipantProfile
 from apps.contest.models import Application
 from apps.lookups.models import Region, QualificationCategory, School, Position, Subject
+from utils.email import send_application_accepted
 
 
 class ApplicationForm(forms.ModelForm):
@@ -143,6 +144,8 @@ class ApplicationForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+        is_new = self.instance.pk is None
+
         with transaction.atomic():
             application = super().save(commit=False)
             application.participant = self.user
@@ -175,5 +178,16 @@ class ApplicationForm(forms.ModelForm):
 
             if commit:
                 application.save()
+
+            # ✅ Отправка письма — с разными шаблонами
+            if is_new:
+                send_application_accepted(self.user.email, context={
+                    "full_name": profile.full_name,
+                })
+            else:
+                from utils.email import send_application_updated
+                send_application_updated(self.user.email, context={
+                    "full_name": profile.full_name,
+                })
 
             return application
