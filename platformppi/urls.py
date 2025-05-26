@@ -21,4 +21,3 @@ urlpatterns += i18n_patterns(
     path("", include("apps.accounts.urls")),
     path("contest/", include("apps.contest.urls", namespace="contest")),
 )
-

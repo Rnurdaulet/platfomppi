@@ -129,8 +129,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
@@ -164,12 +162,15 @@ EMAIL_HOST_PASSWORD = "123987Pp"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
 # Настройки Celery
 CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL брокера сообщений
 CELERY_ACCEPT_CONTENT = ['json']  # Формат данных
 CELERY_TASK_SERIALIZER = 'json'  # Сериализация задач
+
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERYD_TASK_TIME_LIMIT = 300  # секунды
 
 # Настройки периодических задач через Django-Celery-Beat
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
@@ -184,3 +185,97 @@ CACHES = {
         'KEY_PREFIX': 'platformppi',  # Префикс для ключей в Redis
     }
 }
+
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] [{levelname}] {name}:{lineno} — {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "django.log"),
+            "when": "midnight",
+            "backupCount": 7,
+            "formatter": "verbose",
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "errors.log"),
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "verbose",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+
+        "apps": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        }
+
+    },
+}
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+
+sentry_sdk.init(
+    dsn="https://ff7c4fd39c864e31c7446533d216a993@o4509389031800832.ingest.de.sentry.io/4509389032783952",
+    integrations=[DjangoIntegration(), CeleryIntegration()],
+
+    # Вкл. полные данные пользователя (email, id, ip)
+    send_default_pii=True,
+
+    # Производительность — отключена (чтобы не грузить лимит)
+    traces_sample_rate=0.0,
+
+    # Только ошибки уровня WARNING и выше
+    debug=False,
+
+    # Максимально полезно в проде — не отправлять повторяющиеся ошибки за короткий период
+    max_breadcrumbs=50,
+
+    # Не включаем "replay" (если только не нужен)
+    # _experiments={"profiles_sample_rate": 0.0},
+
+    # Указать окружение
+    environment="production",
+
+    # Можно явно указать релиз (например, git hash)
+    release="platformppi@2025.05.26",
+)

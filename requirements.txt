@@ -49,3 +49,5 @@ django-redis
 dotenv
 django-select2
 django-autocomplete-light
+celery
+sentry-sdk[django]
