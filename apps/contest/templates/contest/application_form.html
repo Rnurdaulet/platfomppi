@@ -33,7 +33,7 @@
                 {{ form.non_field_errors }}
             <input type="hidden" name="found_school" id="found_school" value="false">
 
-                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Об участнике </h4></span>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> {% trans "Об участнике" %} </h4></span>
 
                 <div class="mb-3">
                     <label for="{{ form.full_name.id_for_label }}" class="form-label ">
@@ -104,7 +104,7 @@
                         </div>
                     </div>
                 </div>
-                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Регион </h4></span>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4">  {% trans "Регион" %} </h4></span>
 
                 <div class="mb-3">
                     <label for="{{ form.region.id_for_label }}" class="form-label ">
@@ -129,7 +129,7 @@
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="manualSchoolToggle">
                     <label class="form-check-label" for="manualSchoolToggle">
-                        Не нашёл свою организацию
+                         {% trans "Не нашёл свою организацию" %}
                     </label>
                 </div>
 
@@ -152,7 +152,7 @@
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
                 </div>
-                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> Конкурс </h4></span>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4">  {% trans "Конкурс" %} </h4></span>
                 <div class="mb-3">
                     <label for="{{ form.title.id_for_label }}" class="form-label ">
                         {{ form.title.label }}
@@ -187,7 +187,7 @@
                     {% endfor %}
                 </div>
 
-                <span class="divider-center mb-3">Файл заявки</span>
+                <span class="divider-center mb-3">{% trans "Файл заявки" %} </span>
                 <div class="mb-3">
                     <label for="{{ form.file.id_for_label }}" class="form-label ">
                         {{ form.file.label }}
@@ -212,7 +212,7 @@
                 <div class="d-grid">
                     {% if form.instance and form.instance.can_edit %}
                         <button type="submit" class="btn btn-primary btn-lg">
-                            {% trans "Сохранить и продолжить" %}
+                            {% trans "Сохранить" %}
                         </button>
                     {% else %}
                         <a href="{% url 'contest:application_preview' %}" class="btn btn-outline-secondary btn-lg">

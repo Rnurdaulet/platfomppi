@@ -26,18 +26,18 @@
                 <ul class="navbar-nav">
                     {% if not user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link " href="{% url 'ecp_login' %}">Войти</a>
+                            <a class="nav-link " href="{% url 'ecp_login' %}">{% trans "Войти" %}</a>
                         </li>
                     {% endif %}
                     {% if user.is_authenticated %}
                         {% if request.user.role == "participant" %}
                             {% if request.user.applications %}
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'contest:application_preview' %}">Моя заявка</a>
+                                    <a class="nav-link" href="{% url 'contest:application_preview' %}">{% trans "Моя заявка" %}</a>
                                 </li>
                             {% else %}
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'contest:application_create' %}">Подать заявку</a>
+                                    <a class="nav-link" href="{% url 'contest:application_create' %}">{% trans "Подать заявку" %}</a>
                                 </li>
                             {% endif %}
 

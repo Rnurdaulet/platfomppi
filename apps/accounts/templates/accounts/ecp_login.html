@@ -12,7 +12,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-5 col-xl-4 d-none d-lg-flex justify-content-center align-items-center min-vh-lg-100 position-relative "
-                     style="    background-size: cover; background-image: url({% static 'theme/images/ww.png' %});">
+                     style="background-size: cover; background-image: url({% static 'theme/images/ww.png' %});">
                     <div class="flex-grow-1 p-5">
 
                         <div class="position-absolute start-0 end-0 bottom-0 text-center p-5">
@@ -35,7 +35,6 @@
                             <p class="text-muted">{% trans "Авторизуйтесь безопасно, используя NCAlayer для подписи." %}</p>
                                 <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
                         </div>
-
                         <form novalidate>
                             <input type="hidden" id="groupid" value="{{ nonce }}">
 
@@ -45,9 +44,6 @@
                             </div>
                             <div id="status" class="small text-center text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
                         </form>
-
-
-
                         <div class="text-center mt-4">
                             <a href="#" class="small text-primary">{% trans "Нужна помощь с ЭЦП?" %}</a>
                         </div>
