@@ -129,16 +129,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# Redis Cache
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    }
-}
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -172,3 +163,24 @@ EMAIL_HOST_USER = "ppi@orleu-edu.kz"
 EMAIL_HOST_PASSWORD = "123987Pp"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# Настройки Celery
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL брокера сообщений
+CELERY_ACCEPT_CONTENT = ['json']  # Формат данных
+CELERY_TASK_SERIALIZER = 'json'  # Сериализация задач
+
+# Настройки периодических задач через Django-Celery-Beat
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Адрес и порт вашего Redis-сервера
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'platformppi',  # Префикс для ключей в Redis
+    }
+}
