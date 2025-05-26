@@ -33,7 +33,7 @@
                         <div class="text-center mb-5">
                             <h1 class="h2 fw-bold text-primary-gradient">{% trans "Вход с использованием ЭЦП" %}</h1>
                             <p class="text-muted">{% trans "Авторизуйтесь безопасно, используя NCAlayer для подписи." %}</p>
-                                <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
+                            <p class="text-center small text-muted mt-3">{% trans "Убедитесь, что NCAlayer запущен на вашем устройстве." %}</p>
                         </div>
                         <form novalidate>
                             <input type="hidden" id="groupid" value="{{ nonce }}">
@@ -42,7 +42,8 @@
                                 <button type="button" id="signButton"
                                         class="btn btn-primary btn-lg">{% trans "Войти через ЭЦП" %}</button>
                             </div>
-                            <div id="status" class="small text-center text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
+                            <div id="status"
+                                 class="small text-center text-secondary mb-4">{% trans "Ожидание действия..." %}</div>
                         </form>
                         <div class="text-center mt-4">
                             <a href="#" class="small text-primary">{% trans "Нужна помощь с ЭЦП?" %}</a>
@@ -55,6 +56,19 @@
 {% endblock %}
 
 {% block scripts %}
+
+    <script>
+        window.translations = {
+            connecting: "{% trans 'Подключение к NCALayer...' %}",
+            connected: "{% trans 'Подключено! Выполняется подписание...' %}",
+            signatureError: "{% trans 'Ошибка подписи:' %}",
+            signatureReceived: "{% trans 'Подпись получена, отправка на сервер...' %}",
+            signatureValid: "{% trans 'Подпись верна!' %}",
+            signatureInvalid: "{% trans 'Ошибка проверки подписи:' %}",
+            connectionError: "{% trans 'Не удалось подключиться к NCALayer:' %}"
+        };
+    </script>
+
     <script src="{% static 'js/ncalayer-client.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
 {% endblock %}

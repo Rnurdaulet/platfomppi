@@ -6,7 +6,6 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.i18n import JavaScriptCatalog
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("logout/", LogoutView.as_view(), name="logout"),
@@ -22,10 +21,4 @@ urlpatterns += i18n_patterns(
     path("", include("apps.accounts.urls")),
     path("contest/", include("apps.contest.urls", namespace="contest")),
 )
-
-
-
-urlpatterns += [
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
-]
 

@@ -1,17 +1,19 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     async function connectAndSign() {
+        const t = window.translations || {};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const ncalayerClient = new NCALayerClient();
-        document.getElementById("status").innerText = "Подключение к NCALayer...";
+
+        document.getElementById("status").innerText = t.connecting || "Connecting...";
 
         try {
             await ncalayerClient.connect();
         } catch (error) {
-            alert(`Не удалось подключиться к NCALayer: ${error.toString()}`);
+            alert(`${t.connectionError || "Connection failed:"} ${error.toString()}`);
             return;
         }
 
-        document.getElementById("status").innerText = "Подключено! Выполняется подписание...";
+        document.getElementById("status").innerText = t.connected || "Connected...";
         const groupid = document.getElementById("groupid").value;
         const documentBase64 = btoa(groupid);
 
@@ -24,9 +26,10 @@
                 NCALayerClient.basicsSignerSignAny
             );
         } catch (error) {
-            alert("Ошибка подписи: " + error.toString());
+            alert((t.signatureError || "Signature error:") + " " + error.toString());
             return;
         }
+
         if (signature.includes("-----BEGIN CMS-----")) {
             signature = signature
                 .replace("-----BEGIN CMS-----", "")
@@ -35,15 +38,8 @@
                 .trim();
         }
 
+        document.getElementById("status").innerText = t.signatureReceived || "Sending...";
 
-        document.getElementById("status").innerText = "Подпись получена, отправка на сервер...";
-        const bodyData = {
-            signedData: signature,
-            originalData: documentBase64,
-            groupid: groupid
-        };
-
-        // Отправка на сервер
         const response = await fetch("/ru/login/ecp/", {
             method: "POST",
             headers: {
@@ -59,19 +55,16 @@
         const result = await response.json();
 
         document.getElementById("status").innerText = result.success
-            ? "Подпись верна!"
-            : "Ошибка проверки подписи: " + result.message;
+            ? (t.signatureValid || "Signature OK!")
+            : (t.signatureInvalid || "Verification failed:") + " " + result.message;
 
         if (result.success && result.redirectUrl) {
             window.location.href = result.redirectUrl;
         }
     }
 
-    // Назначаем обработчик кнопке подписания
     const signButton = document.getElementById("signButton");
     if (signButton) {
-        signButton.addEventListener("click", () => {
-            connectAndSign();
-        });
+        signButton.addEventListener("click", connectAndSign);
     }
 });

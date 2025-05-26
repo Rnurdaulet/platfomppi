@@ -98,16 +98,16 @@
     </div>
 {% endblock %}
 
-{% block scripts %}
-    {% if not application.is_locked %}
-        <script id="sign-config" type="application/json">
-            {
-                "endpoint": "{% url 'contest:application_sign' %}",
-                "csrf": "{{ csrf_token }}",
-                "uid": "{{ application.uid }}"
-            }
-        </script>
-        <script src="{% static 'js/ncalayer-client.js' %}"></script>
-        <script src="{% static 'js/sign_application.js' %}"></script>
-    {% endif %}
-{% endblock %}
+{#{% block scripts %}#}
+{#    {% if not application.is_locked %}#}
+{#        <script id="sign-config" type="application/json">#}
+{#            {#}
+{#                "endpoint": "{% url 'contest:application_sign' %}",#}
+{#                "csrf": "{{ csrf_token }}",#}
+{#                "uid": "{{ application.uid }}"#}
+{#            }#}
+{#        </script>#}
+{#        <script src="{% static 'js/ncalayer-client.js' %}"></script>#}
+{#        <script src="{% static 'js/sign_application.js' %}"></script>#}
+{#    {% endif %}#}
+{#{% endblock %}#}
