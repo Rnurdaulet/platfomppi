@@ -8,8 +8,10 @@
 
 {% block content %}
     <main id="content" role="main" class="flex-grow-1">
-        {% include "includes/alerts.html" %}
+
         <div class="container-fluid">
+            {% include "includes/alerts.html" %}
+            {% include "includes/mobile-blocker.html" %}
             <div class="row">
                 <div class="col-lg-5 col-xl-4 d-none d-lg-flex justify-content-center align-items-center min-vh-lg-100 position-relative "
                      style="background-size: cover; background-image: url({% static 'theme/images/ww.png' %});">
