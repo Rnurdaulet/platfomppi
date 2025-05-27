@@ -53,7 +53,11 @@ class ApplicationForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"placeholder": _("Если не нашли в списке")})
     )
 
-    found_school = forms.BooleanField(required=False, widget=forms.HiddenInput())
+    not_found_school = forms.BooleanField(
+        required=False,
+        label=_("Не нашёл свою организацию")
+    )
+
     organization_address = forms.CharField(max_length=255, label=_("Адрес организации"))
     phone = forms.CharField(max_length=32, label=_("Телефон"))
     email = forms.EmailField(label=_("Электронная почта"))
@@ -76,10 +80,6 @@ class ApplicationForm(forms.ModelForm):
         model = Application
         exclude = ["uid", "participant", "cms", "is_locked", "submitted_at", "updated_at"]
 
-    def _is_manual_school(self):
-        val = self.data.get("found_school") or self.initial.get("found_school")
-        return val in [False, "false", "False", "", None]
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         assert self.user is not None, "user must be passed to ApplicationForm"
@@ -101,7 +101,8 @@ class ApplicationForm(forms.ModelForm):
                 "region": profile.region,
                 "qualification": profile.qualification,
                 "consent": profile.consent,
-                "organization_name": profile.organization_name if not profile.school else "",
+                "organization_name": profile.organization_name if profile.not_found_school else "",
+                "not_found_school": profile.not_found_school,
             })
         elif not self.instance.pk:
             self.initial["full_name"] = f"{self.user.last_name} {self.user.first_name} {self.user.middlename}"
@@ -116,8 +117,9 @@ class ApplicationForm(forms.ModelForm):
         elif profile and profile.region:
             self.fields["school"].queryset = School.objects.filter(region=profile.region)
 
-        self.fields["school"].required = not self._is_manual_school()
-        self.fields["phone"].widget.attrs.update({"id": "phone"})
+        self.fields["school"].required = not self.data.get("not_found_school")
+        self.fields["phone"].widget.attrs.update({"id": "phone",    "placeholder": "+7 (___) ___-__-__"})
+        self.fields["file"].widget.attrs["accept"] = ".doc,.docx"
 
         # Styling
         for name, field in self.fields.items():
@@ -135,11 +137,11 @@ class ApplicationForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         logger.debug("Running clean() for ApplicationForm")
-        logger.debug("cleaned_data до: %s", cleaned_data)
-        logger.debug("found_school=%s, _is_manual_school=%s", self.data.get("found_school"), self._is_manual_school())
 
-        if self._is_manual_school():
-            logger.debug("Manual school entry selected.")
+        not_found_school = cleaned_data.get("not_found_school", False)
+
+        if not_found_school:
+            logger.debug("Manual school entry selected (checkbox checked).")
             cleaned_data["school"] = None
         else:
             if not cleaned_data.get("school"):
@@ -173,16 +175,14 @@ class ApplicationForm(forms.ModelForm):
             profile.region = self.cleaned_data["region"]
             profile.qualification = self.cleaned_data["qualification"]
             profile.consent = self.cleaned_data["consent"]
+            profile.not_found_school = self.cleaned_data.get("not_found_school", False)
 
-            if self.cleaned_data["organization_name"]:
-                logger.debug("Manual organization entry used.")
+            if profile.not_found_school:
                 profile.school = None
                 profile.organization_name = self.cleaned_data["organization_name"]
-                profile.found_school = False
             else:
                 profile.school = self.cleaned_data["school"]
                 profile.organization_name = ""
-                profile.found_school = True
 
             profile.save()
 

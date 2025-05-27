@@ -217,7 +217,7 @@ class Subject(TranslatableNameMixin, models.Model):
         ordering = ["name_ru"]
 
     def __str__(self):
-        return self.name_ru
+        return self.name
 
 
 class SchoolType(TranslatableNameMixin, models.Model):
@@ -232,7 +232,7 @@ class SchoolType(TranslatableNameMixin, models.Model):
         ordering = ["external_id"]
 
     def __str__(self):
-        return self.name_ru
+        return self.name
 
 
 class SchoolForm(TranslatableNameMixin, models.Model):
@@ -247,7 +247,7 @@ class SchoolForm(TranslatableNameMixin, models.Model):
         ordering = ["external_id"]
 
     def __str__(self):
-        return self.name_ru
+        return self.name
 
 
 class Location(TranslatableNameMixin, models.Model):
@@ -277,10 +277,10 @@ class Position(TranslatableNameMixin, models.Model):
         ordering = ["name_ru"]
 
     def __str__(self):
-        return self.name_ru
+        return self.name
 
 
-class School(models.Model):
+class School(TranslatableNameMixin,models.Model):
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, verbose_name="Регион")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True,
                                  verbose_name="Населённый пункт / Район")
