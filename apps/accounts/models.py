@@ -1,5 +1,4 @@
 import secrets
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -63,58 +62,58 @@ class ParticipantProfile(models.Model):
         on_delete=models.CASCADE,
         related_name="participant_profile",
         limit_choices_to={"role": "participant"},
-        verbose_name="Пользователь"
+        verbose_name=_("Пользователь")
     )
 
-    full_name = models.CharField(max_length=255, verbose_name="Ф.И.О. (из ЭЦП)")
+    full_name = models.CharField(max_length=255, verbose_name=_("Ф.И.О. (из ЭЦП)"))
     position = models.ForeignKey(
         Position,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Должность"
+        verbose_name=_("Должность")
     )
     subject = models.ForeignKey(
         Subject,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="Предмет"
+        verbose_name=_("Предмет")
     )
     qualification = models.ForeignKey(
         QualificationCategory,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Квалификационная категория"
+        verbose_name=_("Квалификационная категория")
     )
     school = models.ForeignKey(
         School,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Школа / Учреждение"
+        verbose_name=_("Школа / Учреждение")
     )
     organization_name = models.CharField(
         max_length=512,
         blank=True,
         null=True,
-        verbose_name="Название организации вручную"
+        verbose_name=_("Название организации вручную")
     )
-    not_found_school = models.BooleanField(default=True, verbose_name="Не нашёл организацию в справочнике")
+    not_found_school = models.BooleanField(default=True, verbose_name=_("Не нашёл организацию в справочнике"))
 
-    organization_address = models.CharField(max_length=255, verbose_name="Адрес организации образования")
-    phone = models.CharField(max_length=32, verbose_name="Контактный телефон")
-    email = models.EmailField(verbose_name="Электронная почта")
+    organization_address = models.CharField(max_length=255, verbose_name=_("Адрес организации образования"))
+    phone = models.CharField(max_length=32, verbose_name=_("Контактный телефон"))
+    email = models.EmailField(verbose_name=_("Электронная почта"))
     region = models.ForeignKey(
         Region,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Регион"
+        verbose_name=_("Регион")
     )
-    consent = models.BooleanField(default=False, verbose_name="Согласие на обработку персональных данных")
+    consent = models.BooleanField(default=False, verbose_name=_("Согласие на обработку персональных данных"))
 
     class Meta:
         db_table = "participant_profile"
-        verbose_name = "Профиль участника"
-        verbose_name_plural = "Профили участников"
+        verbose_name = _("Профиль участника")
+        verbose_name_plural = _("Профили участников")
 
     def __str__(self):
         return f"{self.full_name} — {self.user.username}"
