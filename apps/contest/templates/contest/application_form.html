@@ -32,7 +32,7 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
 
-                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> {% trans "Об участнике" %} </h4></span>
+                <span class="divider-center"><h4 class="text-center mt-4 mb-4"> {% trans "Участник" %} </h4></span>
 
                 <div class="mb-3">
                     <label for="{{ form.full_name.id_for_label }}" class="form-label ">
@@ -71,6 +71,17 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="mb-3">
+                            <label for="{{ form.qualification.id_for_label }}" class="form-label ">
+                                {{ form.qualification.label }}
+                            </label>
+                            {{ form.qualification }}
+                            {% for error in form.qualification.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="mb-3">
                             <label for="{{ form.position.id_for_label }}" class="form-label ">
                                 {{ form.position.label }}
                             </label>
@@ -91,17 +102,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                        <div class="mb-3">
-                            <label for="{{ form.qualification.id_for_label }}" class="form-label ">
-                                {{ form.qualification.label }}
-                            </label>
-                            {{ form.qualification }}
-                            {% for error in form.qualification.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
+
                 </div>
                 <span class="divider-center"><h4 class="text-center mt-4 mb-4">  {% trans "Регион" %} </h4></span>
 
@@ -152,15 +153,6 @@
                     {% endfor %}
                 </div>
                 <span class="divider-center"><h4 class="text-center mt-4 mb-4">  {% trans "Конкурс" %} </h4></span>
-                <div class="mb-3">
-                    <label for="{{ form.title.id_for_label }}" class="form-label ">
-                        {{ form.title.label }}
-                    </label>
-                    {{ form.title }}
-                    {% for error in form.title.errors %}
-                        <div class="invalid-feedback d-block">{{ error }}</div>
-                    {% endfor %}
-                </div>
 
 
                 <div class="mb-3">
@@ -174,19 +166,27 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label ">
+                        {{ form.title.label }}
+                    </label>
+                    {{ form.title }}
+                    {% for error in form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-6">
                     <label for="{{ form.keywords.id_for_label }}" class="form-label">
                         {{ form.keywords.label }}
                     </label>
                     {{ form.keywords }}
-                    {% if form.keywords.help_text %}
-                        <div class="form-text">{{ form.keywords.help_text }}</div>
-                    {% endif %}
+                    {#                    {% if form.keywords.help_text %}#}
+                    {#                        <div class="form-text">{{ form.keywords.help_text }}</div>#}
+                    {#                    {% endif %}#}
                     {% for error in form.keywords.errors %}
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
                 </div>
 
-                <span class="divider-center mb-3">{% trans "Файл заявки" %} </span>
                 <div class="mb-3">
                     <label for="{{ form.file.id_for_label }}" class="form-label ">
                         {{ form.file.label }}
