@@ -192,6 +192,8 @@
                         {{ form.file.label }}
                     </label>
                     {{ form.file }}
+                    <div id="file-name-error" class="invalid-feedback d-block d-none"></div>
+
                     {% for error in form.file.errors %}
                         <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
@@ -248,6 +250,34 @@
         });
 
     </script>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("id_file");
+    const errorDiv = document.getElementById("file-name-error");
+    const MAX_FILENAME_LENGTH = 100;
+
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            errorDiv.classList.add("d-none");
+            errorDiv.innerText = "";
+
+            const file = this.files[0];
+            if (!file) return;
+
+            const filename = file.name;
+
+            if (filename.length > MAX_FILENAME_LENGTH) {
+                errorDiv.innerText = `Название файла слишком длинное (${filename.length} символов). Максимум — ${MAX_FILENAME_LENGTH}.`;
+                errorDiv.classList.remove("d-none");
+                this.value = "";  // сбросить выбранный файл
+            }
+        });
+    }
+});
+</script>
+
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
