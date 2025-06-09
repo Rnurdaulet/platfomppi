@@ -9,66 +9,169 @@
 {% endblock %}
 
 {% block content %}
-<div class="container content-space-t-3 content-space-b-2">
-    <div class="mb-5 text-center">
-        <h1 class="h2">{% trans "Статистика поданных заявок" %}</h1>
-        <p class="text-muted" id="total-apps">{% trans "Загрузка данных..." %}</p>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <canvas id="regionChart" style="height: 400px;"></canvas>
+    <div class="container content-space-t-3 content-space-b-2">
+        <div class="mb-5 text-center">
+            <h1 class="h2">{% trans "Статистика поданных заявок" %}</h1>
+            <p class="text-muted" id="total-apps">{% trans "Загрузка данных..." %}</p>
         </div>
+
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <canvas id="regionChart" style="height: 400px;"></canvas>
+            </div>
+        </div>
+
+        <h2 class="h4 mt-5 mb-3">{% trans "Распределение по регионам и направлениям" %}</h2>
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-sm text-center align-middle" id="region-direction-table">
+                <thead class="table-light">
+                <tr>
+                    <th rowspan="2">{% trans "Регион" %}</th>
+                    <th colspan="1" id="region-direction-head-group">{% trans "Направление конкурса" %}</th>
+                    <th rowspan="2">{% trans "Общее количество" %}</th>
+                </tr>
+                <tr id="region-direction-header-row"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <h2 class="h4 mb-3">{% trans "Распределение по предметам и квалификациям" %}</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center align-middle" id="subject-qualification-table">
+                <thead class="table-light">
+                <tr>
+                    <th rowspan="2">{% trans "Предмет" %}</th>
+                    <th colspan="1" id="subject-qualification-head-group">{% trans "Квалификационная категория" %}</th>
+                    <th rowspan="2">{% trans "Общее кол-во" %}</th>
+                </tr>
+                <tr id="subject-qualification-header-row"></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        try {
-            const response = await fetch("{% url 'contest:application_stats' %}");
-            const data = await response.json();
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const chartRes = await fetch("{% url 'contest:application_stats' %}");
+                const chartData = await chartRes.json();
 
-            document.getElementById("total-apps").innerText =
-                `{{ _('Всего заявок:') }} ${data.total}`;
+                document.getElementById("total-apps").innerText =
+                    `{{ _('Всего заявок:') }} ${chartData.total}`;
 
-            const ctx = document.getElementById("regionChart").getContext("2d");
+                const ctx = document.getElementById("regionChart").getContext("2d");
 
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: data.regions.labels,
-                    datasets: [{
-                        label: "{{ _('Количество заявок') }}",
-                        data: data.regions.data,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: true,
-                            text: "{{ _('Заявки по регионам') }}"
-                        }
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: chartData.regions.labels,
+                        datasets: [{
+                            label: "{{ _('Количество заявок') }}",
+                            data: chartData.regions.data,
+                            borderWidth: 1
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {display: false},
+                            title: {
+                                display: true,
+                                text: "{{ _('Заявки по регионам') }}"
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
                             }
                         }
                     }
+                });
+
+                const tableRes = await fetch("{% url 'contest:application_table_data' %}");
+                const tableData = await tableRes.json();
+
+                // --- РЕГИОНЫ И НАПРАВЛЕНИЯ ---
+                const regionTableBody = document.querySelector("#region-direction-table tbody");
+                const regionHeaderRow = document.getElementById("region-direction-header-row");
+                const regionGroupHead = document.getElementById("region-direction-head-group");
+
+                const allDirections = new Set();
+                Object.values(tableData.region_direction_table).forEach(({directions}) => {
+                    Object.keys(directions).forEach(d => allDirections.add(d));
+                });
+                const directionList = Array.from(allDirections).sort();
+
+                regionHeaderRow.innerHTML = "";
+                directionList.forEach(d => {
+                    const th = document.createElement("th");
+                    th.textContent = d;
+                    regionHeaderRow.appendChild(th);
+                });
+                regionGroupHead.setAttribute("colspan", directionList.length);
+
+                regionTableBody.innerHTML = "";
+                for (const [region, data] of Object.entries(tableData.region_direction_table)) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${region}</td>` +
+                        directionList.map(dir => `<td>${data.directions[dir] || 0}</td>`).join("") +
+                        `<td><strong>${data.total}</strong></td>`;
+                    regionTableBody.appendChild(tr);
                 }
-            });
-        } catch (err) {
-            console.error("Ошибка загрузки данных:", err);
-            document.getElementById("total-apps").innerText =
-                "{{ _('Не удалось загрузить статистику') }}";
-        }
-    });
-</script>
+
+                const regionTotalRow = document.createElement("tr");
+                regionTotalRow.innerHTML = `<td><strong>{{ _('По всем областям') }}</strong></td>` +
+                    directionList.map(() => `<td></td>`).join("") +
+                    `<td><strong>${tableData.total_applications}</strong></td>`;
+                regionTableBody.appendChild(regionTotalRow);
+
+                // --- ПРЕДМЕТЫ И КВАЛИФИКАЦИИ ---
+                const subjectTableBody = document.querySelector("#subject-qualification-table tbody");
+                const subjectHeaderRow = document.getElementById("subject-qualification-header-row");
+                const subjectGroupHead = document.getElementById("subject-qualification-head-group");
+
+                const allQuals = new Set();
+                Object.values(tableData.subject_qualification_table).forEach(({qualifications}) => {
+                    Object.keys(qualifications).forEach(q => allQuals.add(q));
+                });
+                const qualList = Array.from(allQuals).sort();
+
+                subjectHeaderRow.innerHTML = "";
+                qualList.forEach(q => {
+                    const th = document.createElement("th");
+                    th.textContent = q;
+                    subjectHeaderRow.appendChild(th);
+                });
+                subjectGroupHead.setAttribute("colspan", qualList.length);
+
+                subjectTableBody.innerHTML = "";
+                for (const [subject, data] of Object.entries(tableData.subject_qualification_table)) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${subject}</td>` +
+                        qualList.map(q => `<td>${data.qualifications[q] || 0}</td>`).join("") +
+                        `<td><strong>${data.total}</strong></td>`;
+                    subjectTableBody.appendChild(tr);
+                }
+
+                const subjectTotalRow = document.createElement("tr");
+                subjectTotalRow.innerHTML = `<td><strong>{{ _('Всего из всех предметов') }}</strong></td>` +
+                    qualList.map(() => `<td></td>`).join("") +
+                    `<td><strong>${tableData.total_applications}</strong></td>`;
+                subjectTableBody.appendChild(subjectTotalRow);
+
+            } catch (err) {
+                console.error("Ошибка загрузки данных:", err);
+                document.getElementById("total-apps").innerText =
+                    "{{ _('Не удалось загрузить статистику') }}";
+            }
+        });
+    </script>
 {% endblock %}

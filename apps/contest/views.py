@@ -159,3 +159,65 @@ def application_stats_view(request):
             "data": data,
         }
     })
+
+from django.http import JsonResponse
+from django.db.models import Count
+from collections import defaultdict
+
+from apps.contest.models import Application
+from apps.accounts.models import ParticipantProfile
+
+
+def application_table_data_view(request):
+    # --- Первая таблица: регионы + направления ---
+    direction_counts = (
+        Application.objects
+        .filter(participant__participant_profile__region__isnull=False,
+                direction__isnull=False)
+        .values("participant__participant_profile__region__name_ru", "direction__name_ru")
+        .annotate(count=Count("id"))
+    )
+
+    region_table = defaultdict(lambda: defaultdict(int))
+    region_totals = defaultdict(int)
+
+    for row in direction_counts:
+        region = row["participant__participant_profile__region__name_ru"]
+        direction = row["direction__name_ru"]
+        count = row["count"]
+        region_table[region][direction] += count
+        region_totals[region] += count
+
+    # --- Вторая таблица: предмет + квалификация ---
+    profile_counts = (
+        ParticipantProfile.objects
+        .filter(position__isnull=False, qualification__isnull=False)
+        .values("subject__name_ru", "qualification__name_ru")
+        .annotate(count=Count("id"))
+    )
+
+    subject_table = defaultdict(lambda: defaultdict(int))
+    subject_totals = defaultdict(int)
+
+    for row in profile_counts:
+        subject = row["subject__name_ru"] or "Без предмета"
+        qual = row["qualification__name_ru"]
+        count = row["count"]
+        subject_table[subject][qual] += count
+        subject_totals[subject] += count
+
+    return JsonResponse({
+        "region_direction_table": {
+            region: {
+                "directions": dict(direction_counts),
+                "total": region_totals[region]
+            } for region, direction_counts in region_table.items()
+        },
+        "subject_qualification_table": {
+            subject: {
+                "qualifications": dict(qual_counts),
+                "total": subject_totals[subject]
+            } for subject, qual_counts in subject_table.items()
+        },
+        "total_applications": Application.objects.count()
+    })
