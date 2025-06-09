@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Статистика заявок" %}{% endblock %}
+
+{% block head %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container content-space-t-3 content-space-b-2">
+    <div class="mb-5 text-center">
+        <h1 class="h2">{% trans "Статистика поданных заявок" %}</h1>
+        <p class="text-muted" id="total-apps">{% trans "Загрузка данных..." %}</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <canvas id="regionChart" style="height: 400px;"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            const response = await fetch("{% url 'contest:application_stats' %}");
+            const data = await response.json();
+
+            document.getElementById("total-apps").innerText =
+                `{{ _('Всего заявок:') }} ${data.total}`;
+
+            const ctx = document.getElementById("regionChart").getContext("2d");
+
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: data.regions.labels,
+                    datasets: [{
+                        label: "{{ _('Количество заявок') }}",
+                        data: data.regions.data,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: "{{ _('Заявки по регионам') }}"
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Ошибка загрузки данных:", err);
+            document.getElementById("total-apps").innerText =
+                "{{ _('Не удалось загрузить статистику') }}";
+        }
+    });
+</script>
+{% endblock %}

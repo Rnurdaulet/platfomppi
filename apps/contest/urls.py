@@ -3,7 +3,7 @@ from apps.contest.views import (
     ApplicationCreateView,
     ApplicationUpdateView,
     ApplicationPreviewView,
-    ApplicationSignView,
+    ApplicationSignView, application_stats_view, application_chart_view,
 )
 
 app_name = "contest"
@@ -13,4 +13,6 @@ urlpatterns = [
     path("edit/", ApplicationUpdateView.as_view(), name="application_edit"),
     path("preview/", ApplicationPreviewView.as_view(), name="application_preview"),
     path("sign/", ApplicationSignView.as_view(), name="application_sign"),
+    path("api/stats/applications/", application_stats_view, name="application_stats"),
+    path("stats/", application_chart_view, name="application_chart"),
 ]

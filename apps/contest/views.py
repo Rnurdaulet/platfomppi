@@ -123,3 +123,39 @@ class ApplicationSignView(ApplicationBaseView):
         app.save()
 
         return JsonResponse({"success": True, "redirectUrl": "/"})
+
+def application_chart_view(request):
+    return render(request, "contest/applications_stats.html")
+
+from django.db.models import Count
+from django.views.decorators.http import require_GET
+
+@require_GET
+def application_stats_view(request):
+    # Общее количество заявок
+    total_applications = Application.objects.count()
+
+    # Подсчёт заявок по регионам
+    region_data = (
+        Application.objects
+        .filter(participant__participant_profile__region__isnull=False)
+        .values("participant__participant_profile__region__name_ru")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+
+    # Подготовка данных в формате для Chart.js
+    labels = []
+    data = []
+
+    for item in region_data:
+        labels.append(item["participant__participant_profile__region__name_ru"])
+        data.append(item["count"])
+
+    return JsonResponse({
+        "total": total_applications,
+        "regions": {
+            "labels": labels,
+            "data": data,
+        }
+    })
