@@ -2,7 +2,7 @@ from django.contrib import admin
 from unfold.admin import ModelAdmin
 
 from .models import Branch, CompetitionDirection, QualificationCategory, EvaluationCriterion, ExpertRegistry, Region, \
-    Subject, SchoolType, SchoolForm, Location, Position, School
+    Subject, SchoolType, SchoolForm, Location, Position, School, AdminRegistry
 
 
 @admin.register(Region)
@@ -102,6 +102,28 @@ class ExpertRegistryAdmin(ModelAdmin):
             "classes": ("collapse",)
         }),
     )
+
+@admin.register(AdminRegistry)
+class AdminRegistryAdmin(ModelAdmin):
+    list_display = ("iin", "last_name", "first_name", "get_role", "branch")
+    search_fields = ("iin", "last_name", "first_name")
+    list_filter = ("branch",)
+    ordering = ("branch", "last_name", "first_name")
+    readonly_fields = ("created_at", "updated_at")
+
+    fieldsets = (
+        (None, {
+            "fields": ("iin", "last_name", "first_name", "branch")
+        }),
+        ("Служебная информация", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )
+
+    def get_role(self, obj):
+        return obj.role
+    get_role.short_description = "Роль"
 
 
 @admin.register(Subject)

@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from unfold.admin import ModelAdmin
 
 from .models import User
+from ..lookups.models import AdminRegistry
 
 
 @admin.register(User)
@@ -74,3 +75,17 @@ class ParticipantProfileAdmin(ModelAdmin):
 
     readonly_fields = ("user",)
     ordering = ("full_name",)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return qs
+
+        # Получаем регион через филиал администратора
+        admin_entry = AdminRegistry.objects.select_related("branch__region").filter(iin=request.user.username).first()
+
+        if admin_entry and admin_entry.branch and admin_entry.branch.region:
+            return qs.filter(region=admin_entry.branch.region)
+
+        return qs.none()

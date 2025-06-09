@@ -78,7 +78,11 @@ class Application(models.Model):
         ordering = ["-submitted_at"]
 
     def __str__(self):
-        return f"{self.uid} — {self.participant.profile.full_name} — {self.title}"
+        try:
+            full_name = self.participant.participant_profile.full_name
+        except AttributeError:
+            full_name = "—"
+        return f"{self.uid} — {full_name} — {self.title}"
 
     def can_edit(self) -> bool:
         """Можно ли редактировать заявку"""

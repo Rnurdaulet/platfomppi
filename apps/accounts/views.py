@@ -7,10 +7,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from apps.contest.models import Application
-from apps.lookups.models import ExpertRegistry
+from apps.lookups.models import ExpertRegistry, AdminRegistry
 from apps.accounts.models import User
 from utils.nca import verify_ecp_signature
-
+from django.contrib.auth.models import Group
 
 @method_decorator(csrf_exempt, name="dispatch")
 class EcpLoginView(View):
@@ -33,25 +33,49 @@ class EcpLoginView(View):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=400)
 
-        expert = ExpertRegistry.objects.filter(iin=iin).first()
         user_model = get_user_model()
+        user = None
 
-        if expert:
-            user, _ = user_model.objects.get_or_create(
+        # 1. Проверка на администратора
+        admin = AdminRegistry.objects.filter(iin=iin).first()
+        if admin:
+            parts = full_name.strip().split()
+            last_name = parts[0] if len(parts) > 0 else ""
+            first_name = parts[1] if len(parts) > 1 else ""
+            user, created = user_model.objects.get_or_create(
                 username=iin,
                 defaults={
-                    "first_name": expert.first_name,
-                    "last_name": expert.last_name,
-                    "role": expert.role,
-                    "branch": expert.branch,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "role": "admin",
                     "is_active": True,
+                    "is_staff": True,
                 }
             )
-        else:
-            # fallback на участника
-            parts = full_name.strip().split()
 
-            # Надёжно распарсим ФИО: Фамилия Имя [Отчество]
+            if created:
+                # Добавим в группу Admins
+                admins_group, _ = Group.objects.get_or_create(name="Admins")
+                user.groups.add(admins_group)
+
+        # 2. Проверка на эксперта
+        if not user:
+            expert = ExpertRegistry.objects.filter(iin=iin).first()
+            if expert:
+                user, _ = user_model.objects.get_or_create(
+                    username=iin,
+                    defaults={
+                        "first_name": expert.first_name,
+                        "last_name": expert.last_name,
+                        "role": expert.role,
+                        "branch": expert.branch,
+                        "is_active": True,
+                    }
+                )
+
+        # 3. Если не найден ни эксперт, ни админ — создаём участника
+        if not user:
+            parts = full_name.strip().split()
             last_name = parts[0] if len(parts) > 0 else ""
             first_name = parts[1] if len(parts) > 1 else ""
             middlename = parts[2] if len(parts) > 2 else ""

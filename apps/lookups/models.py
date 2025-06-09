@@ -1,6 +1,6 @@
 from django.db import models
 from .mixins import TranslatableNameMixin
-
+from django.utils.translation import gettext_lazy as _
 
 class Region(TranslatableNameMixin, models.Model):
     """
@@ -204,6 +204,52 @@ class ExpertRegistry(models.Model):
     def __str__(self):
         return f"{self.last_name} {self.first_name} ({self.role})"
 
+class AdminRegistry(models.Model):
+    """
+    Справочник утверждённых администраторов.
+    Используется для авторизации и назначения роли 'admin' при входе.
+    """
+
+    iin = models.CharField(
+        max_length=12,
+        unique=True,
+        verbose_name=_("ИИН")
+    )
+
+    last_name = models.CharField(
+        max_length=255,
+        verbose_name=_("Фамилия")
+    )
+    first_name = models.CharField(
+        max_length=255,
+        verbose_name=_("Имя")
+    )
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Филиал")
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "lookups_admin_registry"
+        verbose_name = _("Администратор (реестр)")
+        verbose_name_plural = _("Администраторы (реестр)")
+        ordering = ["branch", "last_name", "first_name"]
+        indexes = [
+            models.Index(fields=["iin"], name="idx_admin_iin")
+        ]
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} (admin)"
+
+    @property
+    def role(self):
+        return "admin"
 
 class Subject(TranslatableNameMixin, models.Model):
     name_ru = models.CharField(max_length=255, verbose_name="Название (рус.)")

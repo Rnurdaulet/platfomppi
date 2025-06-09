@@ -82,7 +82,10 @@
                                 {% endif %}
                             {% endif %}
                         {% endwith %}
-
+                    {% elif request.user.role == "admin" %}
+                        <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
+                            <a href="/admin">{% trans "В админку" %}</a>
+                        </div>
                     {% else %}
                         <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
                             {% trans "Подача заявок доступна только участникам." %}
