@@ -119,13 +119,22 @@
                 regionGroupHead.setAttribute("colspan", directionList.length);
 
                 regionTableBody.innerHTML = "";
-                for (const [region, data] of Object.entries(tableData.region_direction_table)) {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${region}</td>` +
-                        directionList.map(dir => `<td>${data.directions[dir] || 0}</td>`).join("") +
-                        `<td><strong>${data.total}</strong></td>`;
-                    regionTableBody.appendChild(tr);
-                }
+                {#for (const [region, data] of Object.entries(tableData.region_direction_table)) {#}
+                {#    const tr = document.createElement("tr");#}
+                {#    tr.innerHTML = `<td>${region}</td>` +#}
+                {#        directionList.map(dir => `<td>${data.directions[dir] || 0}</td>`).join("") +#}
+                {#        `<td><strong>${data.total}</strong></td>`;#}
+                {#    regionTableBody.appendChild(tr);}#}
+                Object.entries(tableData.region_direction_table)
+                    .sort((a, b) => b[1].total - a[1].total)  // 🔽 сортировка по убыванию total
+                    .forEach(([region, data]) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `<td>${region}</td>` +
+                            directionList.map(dir => `<td>${data.directions[dir] || 0}</td>`).join("") +
+                            `<td><strong>${data.total}</strong></td>`;
+                        regionTableBody.appendChild(tr);
+                    });
+
 
                 const regionTotalRow = document.createElement("tr");
                 regionTotalRow.innerHTML = `<td><strong>{{ _('По всем областям') }}</strong></td>` +
@@ -153,13 +162,23 @@
                 subjectGroupHead.setAttribute("colspan", qualList.length);
 
                 subjectTableBody.innerHTML = "";
-                for (const [subject, data] of Object.entries(tableData.subject_qualification_table)) {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${subject}</td>` +
-                        qualList.map(q => `<td>${data.qualifications[q] || 0}</td>`).join("") +
-                        `<td><strong>${data.total}</strong></td>`;
-                    subjectTableBody.appendChild(tr);
-                }
+                {#for (const [subject, data] of Object.entries(tableData.subject_qualification_table)) {#}
+                {#    const tr = document.createElement("tr");#}
+                {#    tr.innerHTML = `<td>${subject}</td>` +#}
+                {#        qualList.map(q => `<td>${data.qualifications[q] || 0}</td>`).join("") +#}
+                {#        `<td><strong>${data.total}</strong></td>`;#}
+                {#    subjectTableBody.appendChild(tr);}#}
+
+                Object.entries(tableData.subject_qualification_table)
+                    .sort((a, b) => b[1].total - a[1].total)
+                    .forEach(([subject, data]) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `<td>${subject}</td>` +
+                            qualList.map(q => `<td>${data.qualifications[q] || 0}</td>`).join("") +
+                            `<td><strong>${data.total}</strong></td>`;
+                        subjectTableBody.appendChild(tr);
+                    });
+
 
                 const subjectTotalRow = document.createElement("tr");
                 subjectTotalRow.innerHTML = `<td><strong>{{ _('Всего из всех предметов') }}</strong></td>` +
