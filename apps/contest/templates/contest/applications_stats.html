@@ -23,7 +23,8 @@
 
         <h2 class="h4 mt-5 mb-3">{% trans "Распределение по регионам и направлениям" %}</h2>
         <div class="table-responsive mb-5">
-<table class="table table-sm text-center align-middle table-bordered fs-6" id="region-direction-table" style="font-size: 12px;">
+            <table class="table table-sm text-center align-middle table-bordered fs-6" id="region-direction-table"
+                   style="font-size: 12px;">
                 <thead class="table-light">
                 <tr>
                     <th rowspan="2">{% trans "Регион" %}</th>
@@ -136,9 +137,20 @@
                     });
 
 
+                const totalByDirection = {};
+                directionList.forEach(dir => totalByDirection[dir] = 0);
+
+// Подсчитываем сумму по направлениям
+                Object.values(tableData.region_direction_table).forEach(({directions}) => {
+                    directionList.forEach(dir => {
+                        totalByDirection[dir] += directions[dir] || 0;
+                    });
+                });
+
+// Строим строку с итогами
                 const regionTotalRow = document.createElement("tr");
                 regionTotalRow.innerHTML = `<td><strong>{{ _('По всем областям') }}</strong></td>` +
-                    directionList.map(() => `<td></td>`).join("") +
+                    directionList.map(dir => `<td><strong>${totalByDirection[dir]}</strong></td>`).join("") +
                     `<td><strong>${tableData.total_applications}</strong></td>`;
                 regionTableBody.appendChild(regionTotalRow);
 
@@ -180,9 +192,20 @@
                     });
 
 
+                const totalByQualification = {};
+                qualList.forEach(q => totalByQualification[q] = 0);
+
+// Суммируем по всем предметам
+                Object.values(tableData.subject_qualification_table).forEach(({qualifications}) => {
+                    qualList.forEach(q => {
+                        totalByQualification[q] += qualifications[q] || 0;
+                    });
+                });
+
+// Добавляем итоговую строку
                 const subjectTotalRow = document.createElement("tr");
                 subjectTotalRow.innerHTML = `<td><strong>{{ _('Всего из всех предметов') }}</strong></td>` +
-                    qualList.map(() => `<td></td>`).join("") +
+                    qualList.map(q => `<td><strong>${totalByQualification[q]}</strong></td>`).join("") +
                     `<td><strong>${tableData.total_applications}</strong></td>`;
                 subjectTableBody.appendChild(subjectTotalRow);
 
