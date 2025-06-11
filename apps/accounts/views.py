@@ -36,7 +36,7 @@ class EcpLoginView(View):
         user_model = get_user_model()
         user = None
 
-        # 1. Проверка на администратора
+        # 1. Проверка администратора
         admin = AdminRegistry.objects.filter(iin=iin).first()
         if admin:
             parts = full_name.strip().split()
@@ -52,17 +52,20 @@ class EcpLoginView(View):
                     "is_staff": True,
                 }
             )
+            if not created and user.role != "admin":
+                user.role = "admin"
+                user.is_staff = True
+                user.save()
 
             if created:
-                # Добавим в группу Admins
                 admins_group, _ = Group.objects.get_or_create(name="Admins")
                 user.groups.add(admins_group)
 
-        # 2. Проверка на эксперта
+        # 2. Проверка эксперта
         if not user:
             expert = ExpertRegistry.objects.filter(iin=iin).first()
             if expert:
-                user, _ = user_model.objects.get_or_create(
+                user, created = user_model.objects.get_or_create(
                     username=iin,
                     defaults={
                         "first_name": expert.first_name,
@@ -72,14 +75,23 @@ class EcpLoginView(View):
                         "is_active": True,
                     }
                 )
+                if not created:
+                    updated = False
+                    if user.role != expert.role:
+                        user.role = expert.role
+                        updated = True
+                    if hasattr(user, "branch") and user.branch != expert.branch:
+                        user.branch = expert.branch
+                        updated = True
+                    if updated:
+                        user.save()
 
-        # 3. Если не найден ни эксперт, ни админ — создаём участника
+        # 3. Участник (если не найден в двух реестрах)
         if not user:
             parts = full_name.strip().split()
             last_name = parts[0] if len(parts) > 0 else ""
             first_name = parts[1] if len(parts) > 1 else ""
             middlename = parts[2] if len(parts) > 2 else ""
-
             user, _ = user_model.objects.get_or_create(
                 username=iin,
                 defaults={
